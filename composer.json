@@ -14,7 +14,7 @@
     ],
     "require": {
         "zendframework/zendframework": "2.*",
-        "joacub/at-base": "1.*"
+        "joacub/at-base": "dev-master"
     },
     "autoload": {
         "psr-0": {
