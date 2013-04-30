@@ -1,36 +1,46 @@
-<?php if ($this->pageCount > 1): ?>
-<div class="b-pager">
-    <table>
-        <tr>
-            <td>Pages:</td>
-            <td class="prev">
-		        <?php if (isset($this->previous)): ?>
-		          <a href="<?= $this->atBaseQueryParams(array('page' => $this->previous)); ?>" title="<?= $this->translate('Previous page'); ?>">
-		            <i class="icon-arrow-left"></i>
-		          </a>
-		        <?php endif; ?>
-            </td>
+<?php 
+if ($this->pageCount): ?>
+<div class="pagination pagination-left">
+    <ul>
 
-            <td class="page">
-                <ul>
-			        <?php foreach ($this->pagesInRange as $page): ?>
-			            <?php if ($page != $this->current): ?>
-			                <li><a href="<?= $this->atBaseQueryParams(array('page' => $page)) ?>"><?= $page ?></a></li>
-			            <?php else: ?>
-			                <li class="active"><?= $page; ?></li>
-			            <?php endif; ?>
-			        <?php endforeach; ?>
-                </ul>
-            </td>
+        <!-- First page link -->
+        <li<?php echo (isset($this->previous)) ? '' : ' class="disabled"'; ?>>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->first)); ?>">&laquo; First</a>
+        </li>
 
-            <td class="next">
-		        <?php if (isset($this->next)): ?>
-                    <a href="<?= $this->atBaseQueryParams(array('page' => $this->next)); ?>" title="<?= $this->translate('Next page'); ?>">
-                        <i class="icon-arrow-right"></i>
-                    </a>
-		        <?php endif; ?>
-            </td>
-        </tr>
-    </table>
+        <!-- Previous page link -->
+        <li<?php echo (isset($this->previous)) ? '' : ' class="disabled"'; ?>>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->previous-9)); ?>">&lsaquo; Previous 10</a>
+        </li>
+
+        <!-- Numbered page links -->
+        <?php foreach ($this->pagesInRange as $page): ?>
+        <li<?php echo ($page == $this->current) ? ' class="active"' : ''; ?>>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $page)); ?>"><?php echo $page; ?></a>
+        </li>
+        <?php endforeach; ?>
+
+        <!-- Next page link -->
+        <li<?php echo (isset($this->next)) ? '' : ' class="disabled"'; ?>>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->previous+9)); ?>">Next 10 &rsaquo;</a>
+        </li>
+
+        <!-- Last page link -->
+        <li<?php echo (isset($this->next)) ? '' : ' class="disabled"'; ?>>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->last)); ?>">Last &raquo;</a>
+        </li>
+
+    </ul>
 </div>
 <?php endif; ?>
+
+<?php
+$script = $this->inlineScript();
+$script->appendScript(<<<'EOT'
+    
+$(".pagination .disabled a").click(function() {
+  return false;
+});
+
+EOT
+);

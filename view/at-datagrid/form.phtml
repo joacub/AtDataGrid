@@ -1,34 +1,216 @@
 <?php
+use Zend\Json\Json;
+use Zend\Form\Form;
+use Zend\Form\Element;
+use Nette\Diagnostics\Debugger;
+use Zend\Form\Element\Textarea;
 
+$this->headLink()->appendStylesheet($this->basePath() . '/dlu-tw-bootstrap/css/dlu-tw-bootstrap.css');
+
+$columnsTranslatableKeys = null;
+if( $this->gridManager->getGrid()->getDataSource()->isTranslationTable() ) {
+    $columnsTranslatable = $this->gridManager->getGrid()->getDataSource()->getColumnsTranslatable();
+    $columnsTranslatableKeys = array_fill_keys($columnsTranslatable, true);
+}
+ 
+$grid = $this->gridManager->getGrid();
 $form = $this->gridManager->getForm();
-$form->prepare();
-$form->setAttribute('action', $this->url(null, array(), array(), true));
-$form->setAttribute('method', 'post');
-$form->setAttribute('id', 'datagrid-form');
-$form->setAttribute('class', 'form-horizontal grid-form');
-
-echo $this->form()->openTag($form);
-?>
-
-<?php foreach ($form->getElements() as $element): ?>
-    <div class="control-group">
-        <?php if ($element->getAttribute('type') == 'hidden'): ?>
-            <?php echo $this->formHidden($element) ?>
-        <?php else: ?>
-            <?php $element->setLabelAttributes(array('class' => 'control-label')); ?>
-            <?php echo $this->formLabel($element) ?>
-            <div class="controls">
-                <?php echo $this->formElement($element) ?>
-                <p class="help-block">
-                    <?php echo $this->formElementErrors($element); ?>
-                </p>
-            </div>
-        <?php endif; ?>
-    </div>
-<?php endforeach; ?>
+$instanceView = $this;
+$form instanceof Form;
+$originalId = $form->getAttribute('id');
+$printForm = function ($displayOptions = array()) use($form, $columnsTranslatableKeys, 
+$instanceView, $originalId)
+{
+    $formType = 'horizontal';
+    
+    $form->setAttribute('action', 
+        $instanceView->url(null, array(), array(), true));
+    $form->setAttribute('method', 'post');
+    
+    //si contiene idiomas
+    if($instanceView->gridManager->getGrid()->getDataSource()->isTranslationTable()) {
+        $localeElement = $form->get('locale');
+        $form->setAttribute('data-lang', 'datagrid-form-' . $localeElement->getValue());
+    } else {
+        $form->setAttribute('data-lang', 'datagrid-form');
+    }
+    
+    $form->setAttribute('class', 'form-horizontal grid-form');
+    
+    $form->prepare();
+    
+    try {
+    	$instanceView->strokerFormPrepare($originalId);
+    } catch (\Exception $e) {
+    	
+    }
+    echo $instanceView->formTwb()->openTag($form, $formType);
+	?>
+    <?php
+	
+    $uploaders = array();
+	foreach ($form->getElements() as $element) :
+		
+          
+          $options = $element->getOption('ckeditor');
+          
+          if($element->getOption('displayOptions'))
+          	$displayOptions['elements'][$element->getName()] = $element->getOption('displayOptions');
+          
+          if(is_array($options)) {
+          	$this->JoacubCKEditor(
+          			$element->getName(),
+          			(array) $element->getOption('ckeditor')
+          	);
+          }
+          
+          
+          endforeach;
+          echo $instanceView->formFieldsetTwb($form, null, $displayOptions);
+          
+          ?>
 
 <div class="form-actions">
-    <button type="submit" class="btn btn-info">Save</button>
+	<button type="submit" data-loading-text="Guardando..."
+		class="btn btn-primary">Guardar</button>
 </div>
 
-<?php echo $this->form()->closeTag(); ?>
+<?php
+    
+echo $instanceView->formTwb()->closeTag($form, $formType);
+};
+
+if($grid->getDataSource()->isTranslationTable()) :
+    $localeElement = $form->get('locale');
+    $localeElement->setAttribute('type', 'hidden');
+    $locales = $this->joacubBaseLocale()->getLocaleSupported();
+    
+    echo '<style>';
+    foreach ($locales as $locale) {
+        $flag = $instanceView->delCountriesFlagsFlag(Locale::getRegion($locale), 
+            'tiny');
+        $iconLocale = 'icon-locale-' . $locale;
+        echo '.' . $iconLocale . ' {
+            background-image: url("' . $flag . '");
+            background-position: center center;
+        }';
+    }
+    echo '</style>';
+    
+    $displayOptions = array(
+        // The class attribute added to the form tag
+        // 'class' => 'my-form-class',
+        'elements' => array()
+    );
+    
+    foreach ($columnsTranslatable as $column) {
+        $element = $form->get($column);
+        
+        if(isset($columnsTranslatableKeys[$element->getName()])) {
+            $iconLocale = 'icon-locale-' . $localeElement->getValue();
+            $displayOptions['elements'][$element->getName()]['appendIcon'] = $iconLocale;
+        }
+    }
+    
+    ?>
+<div class="tabbable">
+	<!-- Only required for left/right tabs -->
+	<ul id="tabslangs" class="nav nav-tabs">
+	<?php foreach ($locales as $locale):  ?>
+		<li
+			<?php echo $localeElement->getValue() !== $locale ? null : 'class="active"'?>><a
+			href="<?php echo $this->joacubBaseQueryParams(array('locale' => $locale), true); ?>#tab-joacub-crud-locale-<?php echo $locale ?>"
+			data-toggle="tab">
+			<?php 
+			echo $instanceView->delCountriesFlagsFlag(Locale::getRegion($locale),
+			    'tiny', false);
+			?> 
+			<?php echo ucfirst(Locale::getDisplayLanguage($locale)) ?></a></li>
+		<?php endforeach; ?>
+	</ul>
+	<div class="tab-content">
+	
+	<?php foreach($locales as $locale): ?>
+		<div
+			class="tab-pane <?php echo $localeElement->getValue() !== $locale ? null : 'active'?>"
+			id="tab-joacub-crud-locale-<?php echo $locale ?>">
+			<?php $localeElement->getValue() !== $locale ?: $printForm($displayOptions); ?>
+		</div>
+		<?php endforeach; ?>
+	</div>
+</div>
+
+
+<?php else :
+    $printForm();
+    ?>
+
+
+<?php endif;
+
+?>
+
+<script type="text/javascript">
+//<!--
+$(document).ready(function(){
+
+	// button state demo
+    $('button[data-loading-text]').closest('form')
+      .on('submit', function () {
+        var btn = $('button[data-loading-text]')
+        var form = $(this);
+        btn.button('loading')
+        setInterval(function () {
+            if(form.find('.error').length > 0) {
+            	btn.button('reset')
+            }
+          
+        }, 1000)
+      })
+      
+});
+
+$('#tabslangs a').on('shown', function (e) {
+    var parts = $(this).attr('href').split('#');
+    
+    var relateTarget = e.relatedTarget + '';
+    var partsRelateTarget = relateTarget.split('#');
+
+    var $relateTab = $('#' + partsRelateTarget[1]);
+    var $tab = $('#' + parts[1]);
+
+    if($tab.find('form').length == 0) {
+
+    	$tab.height(200);
+        
+        $tab.block({ message: '<img  src="<?php echo $this->basePath(); ?>/img/zf-joacub-crud/ajax-loader.gif" alt="Cargando..." >', css: {height:'128px', width:'128px', background: 'transparent', border: 'none'} });
+        
+    	var iframe = $('<iframe>').hide().attr('src', $(this).attr('href')).load(function() {
+    	    var content = $(this).contents().find('#tabslangs + .tab-content #'+$tab.attr('id')).html();
+    	    $tab.html(content);
+    	    $tab.height('auto');
+    	    $(this).contents().find('body').find("script:contains(\"validate\")").each(function(i) {
+                eval($(this).text());
+            });
+
+            $tab.unblock();
+    	});
+    	
+    	$('body').append(iframe);
+    }
+    	
+    
+    
+    })
+    
+    <?php if(isset($columnsTranslatable)): ?>
+    var columnsTranslatable = <?php echo Json::encode($columnsTranslatable); ?>;
+    $('input, textarea').on('change', function() {
+    	if(columnsTranslatable[$(this).attr('name')]) {
+    	    $('[name="'+$(this).attr('name')+'"]').val($(this).val());
+    	}
+    });
+    <?php endif; ?>
+//-->
+</script>
+

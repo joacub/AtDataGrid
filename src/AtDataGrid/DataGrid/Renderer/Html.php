@@ -3,6 +3,8 @@
 namespace AtDataGrid\DataGrid\Renderer;
 
 use Zend\View\Renderer\RendererInterface;
+use Zend\View\Model\ViewModel;
+use Zend\Mvc\View\Http\InjectTemplateListener;
 
 /**
  * Class Html
@@ -22,6 +24,12 @@ class Html extends AbstractRenderer
      * @var string
      */
     protected $template = 'at-datagrid/grid/list';
+    
+    /**
+     *
+     * @var string;
+     */
+    protected $sm = null;
 
     /**
      * Additional CSS rules
@@ -65,6 +73,22 @@ class Html extends AbstractRenderer
     {
         return $this->template;
     }
+    
+    /**
+     *
+     * @param string $originalTemplate
+     * @return \ZfJoacubCrud\DataGrid\Renderer\Html
+     */
+    public function setServiceManager($sm)
+    {
+    	$this->sm = $sm;
+    	return $this;
+    }
+    
+    public function getServiceManager()
+    {
+    	return $this->sm;
+    }
 
     /**
      * @param $path
@@ -77,15 +101,83 @@ class Html extends AbstractRenderer
     }
 
     /**
-     * @param array $variables
-     * @return string
+     * @param array $options
+     * @return
      */
     public function render($variables = array())
     {
         $engine = $this->getEngine();
-
-        $viewModel = new \Zend\View\Model\ViewModel($variables);
-        $viewModel->setTemplate($this->getTemplate());
+        
+        $sm = $this->getServiceManager();
+        $controller = $sm->get('application');
+        $controller instanceof \Zend\Mvc\Application;
+        $controller->getMvcEvent()->setResult(new ViewModel());
+        $injectTemplateListener  = new InjectTemplateListener();
+        $injectTemplateListener->injectTemplate($controller->getMvcEvent());
+        $model = $controller->getMvcEvent()->getResult();
+        $originalTemplateBase = dirname($model->getTemplate());
+        
+        $viewResolver = $engine->resolver();
+        
+        //list
+        $viewModel = new ViewModel($variables);
+        
+        $viewModel->setTemplate($originalTemplateBase . '/grid/list');
+        if(false === $viewResolver->resolve($viewModel->getTemplate()))
+            $viewModel->setTemplate('at-datagrid/grid/list');
+        
+        //filters
+        $viewGridflashMessenger = new ViewModel($variables);
+        $viewGridflashMessenger->setTemplate($originalTemplateBase . '/grid/flash-messenger');
+        if(false === $viewResolver->resolve($viewGridflashMessenger->getTemplate()))
+        	$viewGridflashMessenger->setTemplate('at-datagrid/grid/flash-messenger');
+        
+        //filters
+        $viewGridFilters = new ViewModel($variables);
+        $viewGridFilters->setTemplate($originalTemplateBase . '/grid/filters');
+        if(false === $viewResolver->resolve($viewGridFilters->getTemplate()))
+            $viewGridFilters->setTemplate('at-datagrid/grid/filters');
+        
+        //row list
+        $viewGridRowsList = new ViewModel($variables);
+        $viewGridRowsList->setTemplate($originalTemplateBase . '/grid/rows/list');
+        if(false === $viewResolver->resolve($viewGridRowsList->getTemplate())) {
+            $viewGridRowsList->setTemplate('at-datagrid/grid/rows/list');
+        }
+        
+        //row group actions
+        $viewGridRowsGoupActions = new ViewModel($variables);
+        $viewGridRowsGoupActions->setTemplate($originalTemplateBase . '/grid/rows/group-actions');
+        if(false === $viewResolver->resolve($viewGridRowsGoupActions->getTemplate())) {
+            $viewGridRowsGoupActions->setTemplate('at-datagrid/grid/group-actions');
+        }
+        
+        $viewGridPaginator = new ViewModel($variables);
+        $viewGridPaginator->setTemplate($originalTemplateBase . '/grid/paginator');
+        if(false === $viewResolver->resolve($viewGridPaginator->getTemplate())) {
+            $viewGridPaginator->setTemplate('at-datagrid/grid/paginator');
+        }
+        
+        // pagination control
+        $viewGridPaginationControl = new ViewModel();
+        $viewGridPaginationControl->setTemplate($originalTemplateBase . '/grid/pagination-control');
+        if(false === $viewResolver->resolve($viewGridPaginationControl->getTemplate())) {
+			$viewGridPaginationControl->setTemplate(
+					'at-datagrid/grid/pagination-control');
+		}
+		
+		$viewGridPaginator->setVariable('viewGridPaginationControl', $viewGridPaginationControl->getTemplate());
+		
+		$viewModel->setVariable('viewGridflashMessenger', $this->getEngine()
+			->render($viewGridflashMessenger))
+			->setVariable('viewGridFilters', $this->getEngine()
+			->render($viewGridFilters))
+			->setVariable('viewGridRowsList', $this->getEngine()
+			->render($viewGridRowsList))
+			->setVariable('viewGridRowsGoupActions', $this->getEngine()
+			->render($viewGridRowsGoupActions))
+			->setVariable('viewGridPaginator', $this->getEngine()
+			->render($viewGridPaginator));
 
         /*if (!empty($this->cssFile)) {
             $this->getView()->headLink()->appendStylesheet($this->cssFile);

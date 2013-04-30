@@ -1,0 +1,15 @@
+<?php
+$messages = $this->flashMessenger()->render(
+		SuperMessenger\Controller\Plugin\SuperMessenger::SUCCESS_MESSAGE);
+if ($messages)
+	echo $this->sxbAlert($messages)->success();
+
+$messages = $this->flashMessenger()->render(
+		SuperMessenger\Controller\Plugin\SuperMessenger::ERROR_MESSAGE);
+if ($messages)
+	echo $this->sxbAlert($messages)->error();
+
+$messages = $this->flashMessenger()->render(
+		SuperMessenger\Controller\Plugin\SuperMessenger::INFO_MESSAGE);
+if ($messages)
+	echo $this->sxbAlert($messages)->info();

@@ -1,11 +1,6 @@
-<?php 
-
-$actionsIcons = array('delete' => '<i class="icon-trash"></i>');
-
-?>
 <div class="atf-grid-group-actions">
-    <div class="btn-group">
-        <a href="#" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" role="button" id="drop-bulk">
+    <div class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" id="drop-bulk">
             <?php echo $this->translate("with selected") ?>
             <span class="caret"></span>
         </a>
@@ -15,9 +10,8 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
                     <li>
                         <a tabindex="-1" onclick="DataGrid.action('<?php echo $action['action'] ?>')"
                            <?php if (isset($action['confirm-message'])): ?>
-                               onclick="return DataGrid.confirmAction(this, '<?php echo $action['confirm-message'] ?>')"
+                               onclick="return DataGrid.confirmAction(this, '<?= $action['confirm-message'] ?>')"
                            <?php endif;?>>
-                           <?php echo isset($actionsIcons[$action['action']]) ? $actionsIcons[$action['action']] : '' ?>
                            <?php echo $this->translate($action['label']) ?></a>
                     </li>
                 <?php endif; ?>

@@ -3,7 +3,7 @@
 namespace AtDataGrid\DataGrid;
 
 use AtDataGrid\DataGrid\DataSource;
-use AtDataGrid\DataGrid\Column\Column;
+use AtDataGrid\DataGrid\Column;
 
 /**
  * Class DataGrid
@@ -17,6 +17,13 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @var string
      */
     protected $caption = '';
+    
+    /**
+     * Grid caption
+     *
+     * @var string
+     */
+    protected $captionBackTo = 'Volver al listado';
     
     /**
      * Data grid columns
@@ -153,6 +160,24 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     {
         return $this->caption;
     }
+    
+    /**
+     * @param $caption
+     * @return DataGrid
+     */
+    public function setCaptionBackTo($caption)
+    {
+    	$this->captionBackTo = $caption;
+    	return $this;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getCaptionBackTo()
+    {
+    	return $this->captionBackTo;
+    }
 
     // COLUMNS
 
@@ -244,7 +269,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * Return column object specified by it name
      *
      * @param $name
-     * @return Column
+     * @return \AtDataGrid\Datagrid\Column
      * @throws \Exception
      */
     public function getColumn($name)
@@ -757,5 +782,20 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     public function getIterator()
     {
         return new \ArrayIterator($this->columns);
+    }
+    
+    public function setTitleColumnName($name)
+    {
+    	$this->titleColumnName = $name;
+    	return $this;
+    }
+    
+    /**
+     *
+     * @return string
+     */
+    public function getTitleColumnName()
+    {
+    	return $this->titleColumnName;
     }
 }

@@ -1,16 +1,13 @@
-<?php $this->headScript()->appendFile('/js/at-datagrid/datagrid.js') ?>
-<?php $this->headLink()->appendStylesheet('/css/at-datagrid/datagrid.css') ?>
+<?php $this->headScript()->appendFile($this->basePath() . '/js/zf-joacub-crud/datagrid.js') ?>
+<?php $this->headScript()->appendFile($this->basePath() . '/js/zf-joacub-crud/jquery.blockUI.js') ?>
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/css/zf-joacub-crud/datagrid.css') ?>
 
-<div class="row item-info">
-    <div class="span2 back">
-        <a href="" title="<?php echo $this->translate('Back to list'); ?>">
-            <i class="icon-arrow-left"></i> <?php echo $this->translate('Back to list'); ?>
+<h2><?php echo $this->translate($this->gridManager->getGrid()->getCaption()) ?></h2>
+<p>
+	<a class="btn"
+		title="<?php echo $this->translate($this->gridManager->getGrid()->getCaptionBackTo()); ?>"
+		href="<?php echo $this->backUrl ?>"> <i class="icon-circle-arrow-left"></i>
+        <?php echo $this->translate($this->gridManager->getGrid()->getCaptionBackTo()); ?>
         </a>
-    </div>
-    <div class="span10 info">
-    </div>
-</div>
-
-<div class="row">
-    <?php echo $this->render('at-datagrid/form') ?>
-</div>
+</p>
+<?php echo $this->render('zf-joacub-crud/form')?>

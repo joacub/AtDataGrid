@@ -4,6 +4,8 @@ namespace AtDataGrid\DataGrid;
 
 use AtDataGrid\DataGrid\Renderer\AbstractRenderer;
 use Zend\Form\Form;
+use Zend\Form\FormInterface;
+use Zend\ServiceManager\ServiceManager;
 
 /**
  * Class Manager
@@ -50,13 +52,16 @@ class Manager
         'edit'   => array('action' => 'edit', 'label' => 'View & Edit', 'bulk' => false, 'button' => true, 'class' => 'icon-eye-open'),
         'delete' => array('action' => 'delete', 'label' => 'Delete', 'confirm-message' => 'Are you sure?', 'bulk' => true, 'button' => false)
     );
+    
+    protected $sl;
 
     /**
      * @param $grid
      */
-    public function __construct(DataGrid $grid)
+    public function __construct(DataGrid $grid, ServiceManager $sm)
     {
         $this->grid = $grid;
+        $this->sl = $sm;
     }
 
     /**
@@ -163,36 +168,92 @@ class Manager
      * @param array $options
      * @return mixed|\Zend\Form\Form
      */
-    public function getForm($options = array())
+    public final function getForm($options = array())
     {
-        if ($this->form == null) {
-            //$form = new ATF_DataGrid_Form();
-            $form = new \Zend\Form\Form('create-form', $options);
-
-            // Collect elements
-            foreach ($this->getGrid()->getColumns() as $column) {
-                if (!$column->isVisibleInForm()) {
-                    continue;
-                }
-
-                /* @var \Zend\Form\Element */
-                $element = $column->getFormElement();
-                $element->setLabel($column->getLabel());
-                $form->add($element);
-            }
-
-            // Hash element to prevent CSRF attack
-            $csrf = new \Zend\Form\Element\Csrf('hash');
-            $form->add($csrf);
-
-            // Use this method to add additional element to form
-            // @todo Use Event instead
-            $form = $this->addExtraFormElements($form);
-
-            $this->form = $form;
-        }
-
-        return $this->form;
+    	if ($this->form == null) {
+    		if(method_exists($this, 'getCustomForm') && $this->getCustomForm($options) != false) {
+    			$form = $this->getCustomForm($options);
+    		} else {
+    			//obtenemos el formulario automaticamente de la entidad en caso de no tener un formulario personalizado
+    			$form = $this->getServiceManager()->get('formGenerator')
+    			->setClass($this->getGrid()->getDataSource()->getEntity())
+    			->getForm();
+    		}
+    
+    		//prepara el formulario
+    		// quita elementos que tenga que quitar y mas
+    		$this->prepareForm($form);
+    
+    	}
+    
+    	return $this->form;
+    }
+    
+    protected function getCustomForm($options = array())
+    {
+    	return null;
+    }
+    
+    public function prepareForm(FormInterface $form)
+    {
+    	// Collect elements
+    	foreach ($this->getGrid()->getColumns() as $column) {
+    		 
+    		 
+    		$formElement = $form->get($column->getName());
+    
+    		if(!$formElement) {
+    			$fieldsets = $form->getFieldsets();
+    			 
+    			foreach($fieldsets as $fieldset) {
+    				$formElement = $fieldset->get($column->getName());
+    				if($formElement)
+    					break;
+    			}
+    		}
+    
+    		if($formElement) {
+    			$optionsElement = $column->getFormElement()->getOptions();
+    			$column->setFormElement($formElement);
+    			$formElement->setOptions($optionsElement + $formElement->getOptions());
+    		}
+    		 
+    		if (!$column->isVisibleInForm()) {
+    			 
+    			$form->remove($column->getName());
+    			$form->getInputFilter()->remove($column->getName());
+    			 
+    			if(isset($fieldset)) {
+    				$form->getInputFilter()->get($fieldset->getName())->remove(($column->getName()));
+    				$fieldset->remove($column->getName());
+    				$fieldset = false;
+    			}
+    			 
+    			continue;
+    		}
+    		continue;
+    		/* @var \Zend\Form\Element */
+    		$element = $column->getFormElement();
+    		 
+    		if(!$form->get($column->getName())->getLabel()) {
+    			$form->get($column->getName())->setLabel($column->getLabel());
+    		}
+    		 
+    	}
+    	 
+    	if(!$this->getserviceManager()->get('response')->getHeaders()->has('ZfJoacubFormJqueryValidate')) {
+    		//Hash element to prevent CSRF attack
+    		$csrf = new \Zend\Form\Element\Csrf('hash');
+    		$form->add($csrf);
+    	}
+    	 
+    	// Use this method to add additional element to form
+    	// @todo Use Event instead
+    	$form = $this->addExtraFormElements($form);
+    	 
+    	$this->form = $form;
+    	
+    	return $form;
     }
 
     /**
@@ -335,5 +396,19 @@ class Manager
         }
 
         return $actions;
+    }
+    
+    public function setServiceManager($serviceLocator)
+    {
+    	$this->sl = $serviceLocator;
+    	return $this;
+    }
+    
+    /**
+     * @return ServiceManager
+     */
+    public function getServiceManager()
+    {
+    	return $this->sl;
     }
 }
