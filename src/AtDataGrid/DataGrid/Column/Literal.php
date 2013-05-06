@@ -13,7 +13,7 @@ class Literal extends Column
 	{
 		parent::init();
 		
-		$this->addDecorator(new Decorator\Literal())
+		$this->addDecorator(new Decorator\Literal($this))
              ->setFormElement(new \Zend\Form\Element\Text($this->getName()));
 	}
 }

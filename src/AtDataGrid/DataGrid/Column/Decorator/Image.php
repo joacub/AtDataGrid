@@ -56,12 +56,12 @@ class Image extends AbstractDecorator
 
         switch ($placement) {
             case self::PREPEND:
-                return $image .  $separator . $content;
+                return parent::render($image .  $separator . $content);
             case self::APPEND:
-                return $content . $separator . $image;
+                return parent::render($content . $separator . $image);
             case self::REPLACE:
             default:
-                return $image;
+                return parent::render($image);
         }
     }
 

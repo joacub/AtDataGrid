@@ -441,5 +441,62 @@ class Column
         $this->filterFormElements[$filterName] = $formElement;
 
         return $this;            
-    }    
+    }
+
+    protected $columns = array();
+    public function addColumn(Column $column, $overwrite = false)
+    {
+    	if ( (false == $overwrite) && ($this->isColumn($column->getName())) ) {
+    		throw new \Exception('Column `' . $column->getName() . '` already in a column list. Use other name. in column ' . $this->getName());
+    	}
+    
+    	$this->columns[$column->getName()] = $column;
+    	
+    	$column->setParent($this);
+    	 
+    	// If label is not set, set column name as label
+    	if (null == $column->getLabel()) {
+    		$column->setLabel($column->getName());
+    	}
+    	 
+    	return $this;
+    }
+    
+    public function isColumn($name)
+    {
+    	return array_key_exists($name, $this->columns);
+    }
+    
+ 	/**
+     * Return column object specified by it name
+     *
+     * @param $name
+     * @throws \Exception
+     * @return \AtDataGrid\Datagrid\Column
+     */
+    public function getColumn($name)
+    {
+        if ($this->isColumn($name)) {
+            return $this->columns[$name];
+        }
+        
+        throw new \Exception("Column '" . $name . "' doesn't exist in column list.");
+    }
+    
+    public function getcolumns()
+    {
+    	return $this->columns;
+    }
+    
+    protected $parent;  
+    public function setParent(Column $column)
+    {
+    	$this->parent = $column;
+    	return $this;
+    }
+    
+    public function getParent()
+    {
+    	return $this->parent;
+    }
 }

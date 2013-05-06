@@ -13,13 +13,14 @@ class HtmlTag extends AbstractDecorator
      * @var string
      */
     protected $placement = self::REPLACE;
-
+    
     /**
      * @param string $tag
      */
-    public function __construct($tag)
+    public function __construct($tag, $column)
     {
         $this->tag = (string) $tag;
+        parent::__construct($column);
     }
 
     /**
@@ -51,6 +52,6 @@ class HtmlTag extends AbstractDecorator
         $tag = $this->getTag();
         $content = '<' . $tag . '>' . $value . '</' . $tag . '>';
 
-        return $content;
+        return parent::render($content);
     }
 }

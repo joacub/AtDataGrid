@@ -2,21 +2,24 @@
 
 namespace AtDataGrid\DataGrid\Column\Decorator;
 
+use AtDataGrid\DataGrid\Column\Column;
 class BitMask extends AbstractDecorator
 {
     /**
      * @var array
      */
     protected $statuses = array();
-
+    
     /**
      * @param array $statuses
      */
-    public function __construct($statuses = array())
+    public function __construct($statuses = array(), Column $column)
     {
         if ($statuses) {
             $this->setStatuses($statuses);            
         }
+        
+       parent::__construct($column);
     }
 
     /**
@@ -43,7 +46,8 @@ class BitMask extends AbstractDecorator
             }    
         }
         
-        return $str;
+        parent::render($str);
+        
     }
     
     /**

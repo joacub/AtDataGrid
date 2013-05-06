@@ -74,6 +74,6 @@ class Literal extends AbstractDecorator
      */
     public function render($value)
     {
-        return $this->escape($value);
+        return parent::render($this->escape($value));
     }
 }

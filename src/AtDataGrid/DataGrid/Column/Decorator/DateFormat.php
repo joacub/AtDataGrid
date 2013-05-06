@@ -2,6 +2,7 @@
 
 namespace AtDataGrid\DataGrid\Column\Decorator;
 
+use AtDataGrid\DataGrid\Column\Column;
 // @todo Use zf2 i18n component
 class DateFormat extends AbstractDecorator
 {
@@ -9,15 +10,17 @@ class DateFormat extends AbstractDecorator
      * @var string
      */
     protected $format = 'd.m.Y H:i';
-
+    
     /**
      * @param string $format
      */
-    public function __construct($format = null)
+    public function __construct(Column $column, $format = null)
     {
     	if ($format) {
     		$this->setFormat($format);
     	}
+    	
+    	parent::__construct($column);
     }
 
     /**
@@ -36,8 +39,12 @@ class DateFormat extends AbstractDecorator
      */
     public function render($value)
     {
+    	if($value instanceof \DateTime) {
+           return parent::render($value->format($this->format));
+        }
+            
         if ($value) {
-            return date($this->format, strtotime($value));
+            return parent::render(date($this->format, strtotime($value)));
         }
     }
 }

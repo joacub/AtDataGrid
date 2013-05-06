@@ -1,5 +1,9 @@
 <?php
 
+use AtDataGrid\DataGrid\Column\Column;
+use Nette\Diagnostics\Debugger;
+use Zend\Form\Form;
+
 $form = $this->grid->getFiltersForm();
 $form->prepare();
 $form->setAttribute('action', $this->url(null, array('action' => 'list')));
@@ -9,21 +13,51 @@ $form->setAttribute('id', 'datagrid-filters-form');
 $this instanceof Zend\View\Renderer\PhpRenderer;
 $filtersClean = array();
 echo $this->form()->openTag($form);
+
+$treeColumnsPrint = function (Column $column, $form) use(&$treeColumnsPrint, $filtersClean) {
+	$html = '';
+	if ($column->isVisible()) {
+		
+		$columns = $column->getcolumns();
+		
+		$visibleSubcolumns = array();
+		foreach ($columns as $_column) {
+			if($_column->isVisible()) {
+				$visibleSubcolumns[] = $_column;
+			}
+		
+		}
+		
+		if($columns && count($visibleSubcolumns) > 0) {
+			foreach($visibleSubcolumns as $_column) {
+				
+				$form instanceof Form;
+				$fieldset = $form->getFieldsets();
+				$html .= $treeColumnsPrint($_column, $fieldset[$column->getName()]);
+			}
+		} else {
+			$html .= '<td>';
+			if ($column->hasFilters()) {
+				foreach ($column->getFilters() as $filter) {
+					$filtersClean[$filter->getName()] = null;
+					$html .= $this->formElement($form->get($filter->getName()));
+					$html .= $this->formElementErrors($form->get($filter->getName()));
+				}
+			}
+			$html .= '</td>';
+		}
+		
+	}
+	
+	return $html;
+};
+
 ?>
 
     <tr class="filters">
         <td><!--  --></td>
         <?php foreach ($this->grid as $column) : ?>
-            <?php if ($column->isVisible()): ?>
-            <td>
-                <?php if ($column->hasFilters()): ?>
-                    <?php foreach ($column->getFilters() as $filter) : ?>
-                        <?php $filtersClean[$filter->getName()] = null; ?> 
-                        <?php echo $this->formElement($form->get($filter->getName())); ?>
-                    <?php endforeach; ?>    
-                <?php endif; ?>
-            </td>
-            <?php endif; ?>
+           <?php echo $treeColumnsPrint($column, $form); ?>
         <?php endforeach; ?>
         <td>
             <div class="btn-group right">

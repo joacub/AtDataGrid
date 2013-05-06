@@ -5,12 +5,13 @@ namespace AtDataGrid\DataGrid\DataSource;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
-use ZfJoacubCrud\DataGrid\Column;
+use AtDataGrid\DataGrid\Column;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Gedmo\Translatable\TranslatableListener;
+use Nette\Diagnostics\Debugger;
 
 class DoctrineDbTableGateway extends AbstractDataSource
 {
@@ -67,12 +68,20 @@ class DoctrineDbTableGateway extends AbstractDataSource
      * @var array
      */
     protected $translatableColumns;
+    
+    protected $parentDataSource;
 
     /**
      * @param $options
      */
 	public function __construct($options)
 	{
+		$insertJoinedColums = true;
+		if(isset($options['insertJoinedColums'])) {
+			$insertJoinedColums = $options['insertJoinedColums'];
+			unset($options['insertJoinedColums']);
+		}
+			
 		parent::__construct($options);
 		
 		// detectamos si la tabla contiene o no traducciones y lo anotamos
@@ -84,7 +93,19 @@ class DoctrineDbTableGateway extends AbstractDataSource
 		    $this->setColumnsTranslatable($config['fields']);
 
 		$this->setQueryBuilder();
-        $this->columns = $this->loadColumns();
+		
+        $this->columns = $this->loadColumns($insertJoinedColums);
+	}
+	
+	public function setParentDataSource($parentDataSource)
+	{
+		$this->parentDataSource = $parentDataSource;
+		return $this;
+	}
+	
+	public function getParentDataSource()
+	{
+		return $this->parentDataSource;
 	}
 
     /**
@@ -221,7 +242,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
      *
      * @return array mixed
      */
-    public function loadColumns()
+    public function loadColumns($insertJoinedColums = true)
     {
         $mapping = $this->getEm()->getClassMetadata($this->getEntity());
         
@@ -258,15 +279,39 @@ class DoctrineDbTableGateway extends AbstractDataSource
             
         }
         
-        foreach($mapping->associationMappings as $map) {
-            $columnName = $map['fieldName'];
-            $columnDataType = $map['type'];
-            
-            $column = new Column\Literal($columnName);
-            $column->setLabel($columnName);
-            
-            $columns[$columnName] = $column;
+        if($insertJoinedColums) {
+	        foreach($mapping->associationMappings as $map) {
+	        	
+	        	$columnName = $map['fieldName'];
+	        	$columnDataType = $map['type'];
+	        	
+	        	$dataSource = new self(array(
+	        		'entity' => $map['targetEntity'],
+	        		'em' => $this->getEm(),
+	        		'insertJoinedColums' => false,
+	        		'parentDataSource' => $this
+	        	));
+	        	
+	        	$column = new Column\DbReference($columnName, $dataSource);
+	        	$column->setLabel($columnName);
+	        	
+	        	$columns[$columnName] = $column;
+	        	
+	        	$columnsJoined = $dataSource->getColumns();
+	        	
+	            $columnName = $map['fieldName'];
+	            $columnDataType = $map['type'];
+	            
+	            foreach($columnsJoined as $_column) {
+	            	$_column->setLabel($columnName);
+	            	$column->addColumn($_column);
+	            }
+	            
+	        }
+	        
         }
+        
+        
         
         // Setup default settings for joined table column fields
         /*foreach ($this->joinedColumns as $columnName) {
@@ -336,7 +381,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
                 $this->getSelect()->orderBy($this->getEntity() . '.' . $order[0], $order[1]);
             }
 
-            $this->getQueryBuilder()->select($this->getEntity());
+            $this->getQueryBuilder()->addSelect($this->getEntity());
             
 	        $paginator = $this->getPaginator();
 	        $paginator->setCurrentPageNumber($currentPage)

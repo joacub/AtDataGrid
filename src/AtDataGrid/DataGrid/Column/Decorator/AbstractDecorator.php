@@ -2,6 +2,8 @@
 
 namespace AtDataGrid\DataGrid\Column\Decorator;
 
+use Zend\View\Model\ViewModel;
+use AtDataGrid\DataGrid\Column\Column;
 abstract class AbstractDecorator implements DecoratorInterface
 {
     /**
@@ -22,13 +24,16 @@ abstract class AbstractDecorator implements DecoratorInterface
      * @var string
      */
     protected $separator = ' ';
+    
+    protected $column;
 
     /**
      * @param string $placement
      */
-    public function __construct($placement = self::APPEND)
+    public function __construct(Column $column, $placement = self::APPEND)
     {
         $this->setPlacement($placement);
+        $this->column = $column;
     }
 
     /**
@@ -65,5 +70,14 @@ abstract class AbstractDecorator implements DecoratorInterface
     public function getSeparator()
     {
         return $this->separator;
+    }
+    
+    public function render($value)
+    {
+    	$viewModel = new ViewModel();
+    	
+    	$viewModel->setTemplate('at-datagrid/grid/rows/item');
+    	$viewModel->setVariable('value', $value)->setVariable('column', $this->column);
+    	return $viewModel;
     }
 }

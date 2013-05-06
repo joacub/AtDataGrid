@@ -2,6 +2,7 @@
 
 namespace AtDataGrid\DataGrid\Column\Decorator;
 
+use AtDataGrid\DataGrid\Column\Column;
 class Alias extends AbstractDecorator
 {
     /**
@@ -12,11 +13,13 @@ class Alias extends AbstractDecorator
     /**
      * @param null $renameTo
      */
-    public function __construct($renameTo = null)
+    public function __construct($renameTo = null, Column $column)
     {
         if (null != $renameTo) {
             $this->setRenameTo($renameTo);
         }
+        
+       parent::__construct($column);
     }
     
     /**
@@ -34,7 +37,8 @@ class Alias extends AbstractDecorator
             return $this->renameTo[$value];
         }
         
-        return $value;
+        parent::render($value);
+        		
     }
 
     /**

@@ -1,21 +1,14 @@
 <?php
+namespace AtDataGrid\DataGrid\Column;
 
-class ATF_DataGrid_Column_DbReference extends ATF_DataGrid_Column
+use AtDataGrid\DataGrid\Column\Decorator\DbReference as DecoratorDbReference;
+use Nette\Diagnostics\Debugger;
+class DbReference extends Column
 {
     /**
-     * @var \ATF_Db_Table_Abstract|null
+     * @var \AtDataGrid\DataGrid\DataSource\DoctrineDbTableGateway
      */
-    protected $referenceTable = null;
-
-    /**
-     * @var string
-     */
-    protected $referenceField = '';
-
-    /**
-     * @var string
-     */
-    protected $resultFieldName = '';
+    protected $dataSource = null;
 
     /**
      * @param $name
@@ -23,11 +16,9 @@ class ATF_DataGrid_Column_DbReference extends ATF_DataGrid_Column
      * @param $referenceField
      * @param $resultFieldName
      */
-    public function __construct($name, ATF_Db_Table_Abstract $refTable, $refField, $resultFieldName)
+    public function __construct($name, $dataSource)
     {
-        $this->referenceTable = $refTable;
-        $this->referenceField = $refField;
-        $this->resultFieldName = $resultFieldName;
+        $this->dataSource = $dataSource;
 
         parent::__construct($name);
     }
@@ -39,22 +30,44 @@ class ATF_DataGrid_Column_DbReference extends ATF_DataGrid_Column
     {
         parent::init();
 
+        $mapping = $this->dataSource->getParentDataSource()->getEm()->getClassMetadata($this->dataSource->getParentDataSource()->getEntity());
+        
+        $map = $mapping->associationMappings[$this->getName()];
+        
+        $select = $this->dataSource->getSelect();
+        
+        
         // Decorator
-        $decorator = new ATF_DataGrid_Column_Decorator_DbReference(
-            $this->referenceTable,
-            $this->referenceField,
-            $this->resultFieldName
-        );
+        $decorator = new DecoratorDbReference($this->dataSource, $this);
+        
         $this->addDecorator($decorator);
-
-        // Form element
-        $select = $this->referenceTable->select()
-                                           ->from($this->referenceTable->getName(), array($this->referenceField, $this->resultFieldName));
-        $allRecords = $this->referenceTable->getAdapter()->fetchPairs($select);
-
-        $formElement = new Zend_Form_Element_Select($this->getName());
-        $formElement->addMultiOption('', '--')
-                    ->addMultiOptions($allRecords);
-        $this->setFormElement($formElement);
+        switch ($map['type']) {
+        	case '4':
+        	case '2':
+        		
+//         		// Form element
+//         		$select = $select->leftJoin($this->dataSource->getEntity() . '.' . $this->getName(), 'alias');
+//         		$allRecords = $this->dataSource->getAdapter()->fetchPairs($select);
+        		
+        		$formElement = new \Zend\Form\Element\Select($this->getName());
+        		$formElement->setValueOptions(array('', '--'));
+//         		->addMultiOptions($allRecords);
+        		$this->setFormElement($formElement);
+        		
+        		break;
+        		/**
+        		 * @todo esto es un ejemplo no es funcional
+        		 */
+        	default:
+        		// Form element
+        		$select = $select->leftJoin($this->dataSource->getEntity() . '.' . $this->getName(), 'alias');
+        		$allRecords = $this->dataSource->getAdapter()->fetchPairs($select);
+        		
+        		$formElement = new \Zend\Form\Element\Select($this->getName());
+        		$formElement->addMultiOption('', '--')
+        		->addMultiOptions($allRecords);
+        		$this->setFormElement($formElement);
+        		break;
+        }
     }
 }

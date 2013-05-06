@@ -3,7 +3,8 @@
 namespace AtDataGrid\DataGrid;
 
 use AtDataGrid\DataGrid\DataSource;
-use AtDataGrid\DataGrid\Column;
+use AtDataGrid\DataGrid\Column\Column;
+use Nette\Diagnostics\Debugger;
 
 /**
  * Class DataGrid
@@ -269,8 +270,8 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * Return column object specified by it name
      *
      * @param $name
-     * @return \AtDataGrid\Datagrid\Column
      * @throws \Exception
+     * @return \AtDataGrid\Datagrid\Column
      */
     public function getColumn($name)
     {
@@ -557,18 +558,27 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      *
      * @param $values
      */
-    public function applyFilters($values)
+    public function applyFilters($values, Column $column = null)
     {
-        $columns = $this->getColumns();
+    	if($column === null) {
+        	$columns = $this->getColumns();
+    	} else {
+    		$columns = $column->getcolumns();
+    		$values = $values[$column->getName()];
+    	}
 
         /** @var \Zend\Db\Sql\Select $select  */
         $select = $this->getDataSource()->getSelect();
 
-        foreach ($columns as $column) {
-            $filters = $column->getFilters();
-
+        foreach ($columns as $_column) {
+            $filters = $_column->getFilters();
+            
+            $subColumns = $_column->getColumns();
+            if(count($subColumns) > 0)
+            	$this->applyFilters($values, $_column);
+            
             foreach ($filters as $filter) {
-                $filter->apply($select, $column, $values[$filter->getName()]);
+                $filter->apply($select, $_column, $values[$filter->getName()]);
             }
         }
 
@@ -581,23 +591,57 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @param array $options
      * @return \Zend\Form\Form
      */
-    public function getFiltersForm($options = array())
+    public function getFiltersForm($options = array(), Column $column = null)
     {
-        $form = new \Zend\Form\Form('filters-form', $options);
-
-        foreach ($this->getColumns() as $column) {
-            if ($column->hasFilters()) {
-	            $filters = $column->getFilters();
-	            foreach ($filters as $filter) {
-	                $form->add($column->getFilterFormElement($filter));
-	            }	
-            }
+    	
+    	$name = 'filters-form';
+    	if($column !== null)
+    		$name = $column->getName();
+    	
+        $form = new \Zend\Form\Form($name, $options);
+        
+        $insertApplyElement = false;
+        if($column === null) {
+        	$columns = true;
+        	$columns = $this->getColumns();
+        }  else {
+        	$columns = $column->getcolumns();
+        }
+        
+        foreach ($columns as $column) {
+        	
+        	$subColumns = $column->getColumns();
+        	
+        	
+        	if(count($subColumns) > 0) {
+        		$form->add($this->getFiltersForm($options, $column));
+        		
+        		if ($column->hasFilters()) {
+        			$filters = $column->getFilters();
+        			foreach ($filters as $filter) {
+        				$form->add($column->getFilterFormElement($filter));
+        			}
+        		}
+        		
+        	} else {
+        		 
+        		if ($column->hasFilters()) {
+        			$filters = $column->getFilters();
+        			foreach ($filters as $filter) {
+        				$form->add($column->getFilterFormElement($filter));
+        			}
+        		}
+        	}
+        	
+        	
         }
 
-        // Apply button
-        $apply = new \Zend\Form\Element\Submit('apply');
-        $apply->setLabel('Поиск');
-        $form->add($apply);
+        if($insertApplyElement) {
+	        // Apply button
+	        $apply = new \Zend\Form\Element\Submit('apply');
+	        $apply->setLabel('Поиск');
+	        $form->add($apply);
+        }
         
         return $form;
     }

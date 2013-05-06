@@ -31,7 +31,7 @@ class HyperLink extends AbstractDecorator
         
         $url = vsprintf($this->url, $params);
         
-        return '<a href="' . $url . '">' . $value . '</a>';
+        return parent::render('<a href="' . $url . '">' . $value . '</a>');
     }
 
     /**

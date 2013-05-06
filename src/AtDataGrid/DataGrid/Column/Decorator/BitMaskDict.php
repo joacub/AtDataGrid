@@ -2,12 +2,13 @@
 
 namespace AtDataGrid\DataGrid\Column\Decorator;
 
+use AtDataGrid\DataGrid\Column\Column;
 class BitMaskDict extends AbstractDecorator
 {
     protected $choises = array();
     protected $delimiter = '<br/>';
-
-    public function __construct($options = array())
+    
+    public function __construct($options = array(), Column $column)
     {
         if (array_key_exists('choises', $options)) {
             $this->setChoises($options['choises']);
@@ -16,6 +17,8 @@ class BitMaskDict extends AbstractDecorator
         if (array_key_exists('delimiter', $options)) {
             $this->setDelimiter($options['delimiter']);
         }
+        
+        parent::__construct($column);
     }
 
     public function setChoises($choises = array())
@@ -36,6 +39,6 @@ class BitMaskDict extends AbstractDecorator
                 $rs[] = $v;
             }
         }
-        return implode($this->delimiter, $rs);
+        return parent::render(implode($this->delimiter, $rs));
     }
 }
