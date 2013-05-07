@@ -1,6 +1,5 @@
-<?php $this->headScript()->appendFile($this->basePath() . '/js/zf-joacub-crud/datagrid.js') ?>
-<?php $this->headScript()->appendFile($this->basePath() . '/js/zf-joacub-crud/jquery.blockUI.js') ?>
-<?php $this->headLink()->appendStylesheet($this->basePath() . '/css/zf-joacub-crud/datagrid.css') ?>
+<?php $this->headScript()->appendFile($this->basePath() . '/js/at-datagrid/datagrid.js') ?>
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/css/at-datagrid/datagrid.css') ?>
 
 <h2><?php echo $this->translate($this->gridManager->getGrid()->getCaption()) ?></h2>
 <p>
@@ -10,4 +9,4 @@
         <?php echo $this->translate($this->gridManager->getGrid()->getCaptionBackTo()); ?>
         </a>
 </p>
-<?php echo $this->render('zf-joacub-crud/form')?>
+<?php echo $this->render('at-datagrid/form')?>

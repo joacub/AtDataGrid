@@ -1,6 +1,6 @@
-<?php $this->headScript()->appendFile($this->basePath() . '/js/zf-joacub-crud/datagrid.js') ?>
-<?php $this->headScript()->appendFile($this->basePath() . '/js/zf-joacub-crud/jquery.blockUI.js') ?>
-<?php $this->headLink()->appendStylesheet($this->basePath() . '/css/zf-joacub-crud/datagrid.css') ?>
+<?php $this->headScript()->appendFile($this->basePath() . '/js/at-datagrid/datagrid.js') ?>
+<?php $this->headScript()->appendFile($this->basePath() . '/js/at-datagrid/jquery.blockUI.js') ?>
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/css/at-datagrid/datagrid.css') ?>
 <?php 
 $actionsIcons = array(
     'delete' => '<i class="icon-trash"></i>',
@@ -17,7 +17,7 @@ $actionsIcons = array(
         </a>
 </p>
 
-<?php echo $this->render('zf-joacub-crud/item/info')?>
+<?php echo $this->render('at-datagrid/item/info')?>
 
 <div class="btn-group right pull-right">
 	<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><?php echo $this->translate('actions')?> <span
