@@ -3,6 +3,8 @@
 namespace AtDataGrid\DataGrid\Column\Decorator;
 
 use AtDataGrid\DataGrid\Column\Column;
+use Nette\Diagnostics\Debugger;
+use Zend\View\Model\ViewModel;
 class Alias extends AbstractDecorator
 {
     /**
@@ -30,15 +32,15 @@ class Alias extends AbstractDecorator
     public function render($value)
     {
         if (!isset($this->renameTo)) {
-            return $value;
+            return parent::render($value->getVariable('value'));
         }
         
-        if (isset($this->renameTo[$value])) {
-            return $this->renameTo[$value];
+        if (isset($this->renameTo[$value->getVariable('value')])) {
+            return parent::render($this->renameTo[$value->getVariable('value')]);
         }
         
-        parent::render($value);
-        		
+        return $value;
+        
     }
 
     /**
