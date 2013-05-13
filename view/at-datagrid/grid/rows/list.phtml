@@ -23,11 +23,6 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
                 $value = $row->{"get" . ucfirst($collumn->getName())}();
 				$arrayOrViewModel = $collumn->render($value, $row);
 				
-				if(!$arrayOrViewModel instanceof Zend\View\Model\ViewModel){
-					Debugger::dump($collumn);
-exit;
-				}
-				
 				if(is_array($arrayOrViewModel)) {
 					foreach($arrayOrViewModel as $viewModel)
 						echo $this->render($viewModel);
