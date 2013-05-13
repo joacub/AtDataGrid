@@ -2,7 +2,7 @@
 
 namespace AtDataGrid\DataGrid\Column;
 
-use AtDataGrid\DataGrid\Column\Decorator\Literal;
+use AtDataGrid\DataGrid\Column\Decorator\Literal as DLiteral;
 
 class Textarea extends Column
 {
@@ -10,6 +10,6 @@ class Textarea extends Column
     {
         parent::init();
 
-        $this->setFormElement(new \Zend\Form\Element\Textarea($this->getName()))->addDecorator(new Literal($this));
+        $this->setFormElement(new \Zend\Form\Element\Textarea($this->getName()))->addDecorator(new DLiteral($this));
     }
 }
