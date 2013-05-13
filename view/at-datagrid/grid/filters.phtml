@@ -18,8 +18,7 @@ $treeColumnsPrint = function (Column $column, $form) use(&$treeColumnsPrint, $fi
 	$html = '';
 	if ($column->isVisible()) {
 		
-		$columns = $column->getcolumns();
-		
+		$columns = (array) $column->getcolumns();
 		$visibleSubcolumns = array();
 		foreach ($columns as $_column) {
 			if($_column->isVisible()) {

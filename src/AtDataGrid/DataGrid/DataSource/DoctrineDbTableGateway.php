@@ -257,19 +257,19 @@ class DoctrineDbTableGateway extends AbstractDataSource
             
             switch (true) {
                 case in_array($columnDataType, array('datetime', 'timestamp', 'time')):
-                    $column = new Column\DateTime($columnName);
+                    $column = new Column\DateTime($columnName, $this);
                     break;
             
                 case in_array($columnDataType, array('date', 'year')):
-                    $column = new Column\Date($columnName);
+                    $column = new Column\Date($columnName, $this);
                     break;
             
                 case in_array($columnDataType, array('mediumtext', 'text')):
-                    $column = new Column\Textarea($columnName);
+                    $column = new Column\Textarea($columnName, $this);
                     break;
             
                 default:
-                    $column = new Column\Literal($columnName);
+                    $column = new Column\Literal($columnName, $this);
                     break;
             }
             
@@ -297,15 +297,15 @@ class DoctrineDbTableGateway extends AbstractDataSource
 	        	
 	        	$columns[$columnName] = $column;
 	        	
-	        	$columnsJoined = $dataSource->getColumns();
+	        	//$columnsJoined = $dataSource->getColumns();
 	        	
 	            $columnName = $map['fieldName'];
 	            $columnDataType = $map['type'];
 	            
-	            foreach($columnsJoined as $_column) {
+	            /*foreach($columnsJoined as $_column) {
 	            	$_column->setLabel($columnName);
 	            	$column->addColumn($_column);
-	            }
+	            }*/
 	            
 	        }
 	        
@@ -375,6 +375,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
      */
     public function fetch($listType, $order, $currentPage, $itemsPerPage, $pageRange)
     {
+    	
     	if ($listType == AbstractDataSource::LIST_TYPE_PLAIN) {
             if ($order) {
                 $order = explode(' ', $order);

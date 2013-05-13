@@ -3,6 +3,7 @@
 namespace AtDataGrid\DataGrid\Column;
 
 use AtDataGrid\DataGrid\Column\Decorator;
+use Nette\Diagnostics\Debugger;
 
 class Column
 {
@@ -74,17 +75,25 @@ class Column
      * @var array
      */
     protected $decorators = array();
+    
+    /**
+     *
+     * @var \AtDataGrid\DataGrid\DataSource\DoctrineDbTableGateway
+     */
+    protected $dataSource = null;
 
     /**
      * @param $name
      */
-    public function __construct($name)
+    public function __construct($name, $dataSource)
     {
         $this->setName($name);
 
         if (null === $this->getName()) {
             throw new \Exception('Please specify a column name');
         };
+        
+        $this->dataSource = $dataSource;
         
         // Extensions...
         $this->init();
@@ -309,7 +318,7 @@ class Column
     public function render($value, $row = null)
     {
         foreach ($this->decorators as $decorator) {
-            $value = $decorator->render($value, $row);    
+            $value = $decorator->render($value, $row, $this->dataSource);    
         }
         return $value;
     }
@@ -443,7 +452,7 @@ class Column
         return $this;            
     }
 
-    protected $columns = array();
+    protected $columns = null;
     public function addColumn(Column $column, $overwrite = false)
     {
     	if ( (false == $overwrite) && ($this->isColumn($column->getName())) ) {
@@ -467,6 +476,15 @@ class Column
     	return array_key_exists($name, $this->columns);
     }
     
+    static public $counter;
+    protected function loadColumns()
+    {
+    	if(!$this->columns) {
+    		self::$counter++;
+    		$this->columns = $this->dataSource->loadColumns();
+    	}
+    }
+    
  	/**
      * Return column object specified by it name
      *
@@ -476,6 +494,11 @@ class Column
      */
     public function getColumn($name)
     {
+    	
+    	if($this instanceof DbReference) {
+    		 $this->loadColumns();
+    	}
+    	
         if ($this->isColumn($name)) {
             return $this->columns[$name];
         }
@@ -483,7 +506,7 @@ class Column
         throw new \Exception("Column '" . $name . "' doesn't exist in column list.");
     }
     
-    public function getcolumns()
+    public function getColumns()
     {
     	return $this->columns;
     }
@@ -498,5 +521,10 @@ class Column
     public function getParent()
     {
     	return $this->parent;
+    }
+    
+    public function getdataSource()
+    {
+    	return $this->dataSource;
     }
 }

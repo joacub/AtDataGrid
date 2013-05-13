@@ -563,22 +563,22 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     	if($column === null) {
         	$columns = $this->getColumns();
     	} else {
-    		$columns = $column->getcolumns();
-    		$values = $values[$column->getName()];
+    		$columns = $column->getColumns();
+    		
+    		$values = @$values[$column->getName()];
     	}
 
         /** @var \Zend\Db\Sql\Select $select  */
         $select = $this->getDataSource()->getSelect();
 
         foreach ($columns as $_column) {
-            $filters = $_column->getFilters();
-            
-            $subColumns = $_column->getColumns();
-            if(count($subColumns) > 0)
-            	$this->applyFilters($values, $_column);
+             $filters = $_column->getFilters();
+             $subColumns = $_column->getColumns();
+             if(count($subColumns) > 0)
+             	$this->applyFilters($values, $_column);
             
             foreach ($filters as $filter) {
-                $filter->apply($select, $_column, $values[$filter->getName()]);
+                $filter->apply($select, $_column, @$values[$filter->getName()]);
             }
         }
 
@@ -605,10 +605,13 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         	$columns = true;
         	$columns = $this->getColumns();
         }  else {
-        	$columns = $column->getcolumns();
+        	$columns = $column->getColumns();
         }
         
         foreach ($columns as $column) {
+        	
+        	if(!$column->isVisible())
+        		continue;
         	
         	$subColumns = $column->getColumns();
         	

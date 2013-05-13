@@ -8,7 +8,7 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint)
 {
 	$html = '';
 	if ($column->isVisible()) {
-		$columns = $column->getcolumns();
+		$columns = (array) $column->getColumns();
 		
 		$visibleSubcolumns = array();
 		foreach ($columns as $_column) {
