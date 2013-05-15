@@ -11,6 +11,6 @@ class Date extends Column
     	parent::init();
     	
         $this->setFormElement(new \Zend\Form\Element\DateTime($this->getName()))
-             ->addDecorator(new Decorator\DateFormat('d.m.Y'));
+             ->addDecorator(new Decorator\DateFormat($this, 'd.m.Y'));
     }
 }

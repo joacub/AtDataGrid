@@ -5,6 +5,7 @@ namespace AtDataGrid\DataGrid;
 use AtDataGrid\DataGrid\DataSource;
 use AtDataGrid\DataGrid\Column\Column;
 use Nette\Diagnostics\Debugger;
+use Zend\EventManager\EventManager;
 
 /**
  * Class DataGrid
@@ -518,13 +519,16 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @param $data
      * @param null $identifier
      */
-    public function save($data, $identifier = null)
+    public function save(EventManager $eventManager, $data, $identifier = null)
     {
         if ($identifier) {
             $id = $this->update($data, $identifier);
         } else {
             $id = $this->insert($data);
         }
+        
+        $params = compact('data', 'id');
+        $eventManager->trigger(__FUNCTION__, $this, $params);
 
         return $id;
     }
