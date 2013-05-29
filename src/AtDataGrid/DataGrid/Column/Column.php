@@ -406,6 +406,12 @@ class Column
         return $this->filters;
     }
     
+    public function clearFilters()
+    {
+    	$this->filters = array();
+    	return $this;
+    }
+    
     /**
      * Is column has filters?
      * 

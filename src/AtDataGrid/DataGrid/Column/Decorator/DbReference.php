@@ -44,8 +44,8 @@ class DbReference extends AbstractDecorator
 		}
 		
 		$containsColumns = false;
-		$columns = $this->column->getcolumns();
-		foreach($columns as $column) {
+		$columns = $this->column->getColumns();
+		foreach((array) $columns as $column) {
 			if($column->isVisible()) {
 				$containsColumns = true;
 				break;
@@ -66,7 +66,6 @@ class DbReference extends AbstractDecorator
 			
 		} else {
 			switch (true) {
-				
 				case $value instanceof PersistentCollection:
 					$value = $value->count();
 					break;

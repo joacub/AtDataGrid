@@ -6,6 +6,7 @@ use AtDataGrid\DataGrid\Renderer\AbstractRenderer;
 use Zend\Form\Form;
 use Zend\Form\FormInterface;
 use Zend\ServiceManager\ServiceManager;
+use Nette\Diagnostics\Debugger;
 
 /**
  * Class Manager
@@ -171,22 +172,29 @@ class Manager
     public final function getForm($options = array())
     {
     	if ($this->form == null) {
-    		if(method_exists($this, 'getCustomForm') && $this->getCustomForm($options) != false) {
-    			$form = $this->getCustomForm($options);
+    		if(method_exists($this, 'getCustomForm') && ($form = $this->getCustomForm($options)) != false) {
+    			//$form = $this->getCustomForm($options);
     		} else {
     			//obtenemos el formulario automaticamente de la entidad en caso de no tener un formulario personalizado
-    			$form = $this->getServiceManager()->get('formGenerator')
-    			->setClass($this->getGrid()->getDataSource()->getEntity())
-    			->getForm();
+    			$form = $this->_getForm($options);
     		}
     
     		//prepara el formulario
     		// quita elementos que tenga que quitar y mas
-    		$this->prepareForm($form);
+    		return $this->prepareForm($form);
     
     	}
     
     	return $this->form;
+    }
+    
+    protected final function _getForm()
+    {
+    	$form = $this->getServiceManager()->get('formGenerator')
+    	->setClass($this->getGrid()->getDataSource()->getEntity())
+    	->getForm();
+    	
+    	return $form;
     }
     
     protected function getCustomForm($options = array())
@@ -252,6 +260,7 @@ class Manager
     	$form = $this->addExtraFormElements($form);
     	 
     	$this->form = $form;
+    	$this->isPrepared = true;
     	
     	return $form;
     }
