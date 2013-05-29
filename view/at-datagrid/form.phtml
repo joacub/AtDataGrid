@@ -17,9 +17,9 @@ $grid = $this->gridManager->getGrid();
 $form = $this->gridManager->getForm();
 $instanceView = $this;
 $form instanceof Form;
-$originalId = $form->getAttribute('id');
+$strokerFormAlias = $form->getOption('stroker_form_alias');
 $printForm = function ($displayOptions = array()) use($form, $columnsTranslatableKeys, 
-$instanceView, $originalId)
+$instanceView, $strokerFormAlias)
 {
     $formType = 'horizontal';
     
@@ -39,11 +39,8 @@ $instanceView, $originalId)
     
     $form->prepare();
     
-    try {
-    	$instanceView->strokerFormPrepare($originalId);
-    } catch (\Exception $e) {
-    	
-    }
+    if($strokerFormAlias)
+    	$instanceView->strokerFormPrepare($strokerFormAlias);
     echo $instanceView->formTwb()->openTag($form, $formType);
 	?>
     <?php
@@ -119,7 +116,7 @@ if($grid->getDataSource()->isTranslationTable()) :
 	<?php foreach ($locales as $locale):  ?>
 		<li
 			<?php echo $localeElement->getValue() !== $locale ? null : 'class="active"'?>><a
-			href="<?php echo $this->joacubBaseQueryParams(array('locale' => $locale), true); ?>#tab-joacub-crud-locale-<?php echo $locale ?>"
+			href="<?php echo $this->joacubBaseQueryParams(array('locale' => $locale), true); ?>#tab-at-datagrid-locale-<?php echo $locale ?>"
 			data-toggle="tab">
 			<?php 
 			echo $instanceView->delCountriesFlagsFlag(Locale::getRegion($locale),
@@ -133,7 +130,7 @@ if($grid->getDataSource()->isTranslationTable()) :
 	<?php foreach($locales as $locale): ?>
 		<div
 			class="tab-pane <?php echo $localeElement->getValue() !== $locale ? null : 'active'?>"
-			id="tab-joacub-crud-locale-<?php echo $locale ?>">
+			id="tab-at-datagrid-locale-<?php echo $locale ?>">
 			<?php $localeElement->getValue() !== $locale ?: $printForm($displayOptions); ?>
 		</div>
 		<?php endforeach; ?>
@@ -183,7 +180,7 @@ $('#tabslangs a').on('shown', function (e) {
 
     	$tab.height(200);
         
-        $tab.block({ message: '<img  src="<?php echo $this->basePath(); ?>/img/zf-joacub-crud/ajax-loader.gif" alt="Cargando..." >', css: {height:'128px', width:'128px', background: 'transparent', border: 'none'} });
+        $tab.block({ message: '<img  src="<?php echo $this->basePath(); ?>/img/at-datagrid/ajax-loader.gif" alt="Cargando..." >', css: {height:'128px', width:'128px', background: 'transparent', border: 'none'} });
         
     	var iframe = $('<iframe>').hide().attr('src', $(this).attr('href')).load(function() {
     	    var content = $(this).contents().find('#tabslangs + .tab-content #'+$tab.attr('id')).html();

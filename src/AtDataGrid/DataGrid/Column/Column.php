@@ -481,7 +481,7 @@ class Column
     {
     	if(!$this->columns) {
     		self::$counter++;
-    		$this->columns = $this->dataSource->loadColumns();
+    		$this->columns = $this->dataSource->loadColumns(true, $this);
     	}
     }
     

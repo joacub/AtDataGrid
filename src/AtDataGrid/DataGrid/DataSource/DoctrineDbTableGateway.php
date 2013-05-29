@@ -242,7 +242,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
      *
      * @return array mixed
      */
-    public function loadColumns($insertJoinedColums = true)
+    public function loadColumns($insertJoinedColums = true, $parentCollum = null)
     {
         $mapping = $this->getEm()->getClassMetadata($this->getEntity());
         
@@ -274,6 +274,8 @@ class DoctrineDbTableGateway extends AbstractDataSource
             }
             
             $column->setLabel($columnName);
+            if($parentCollum !== null)
+           		$column->setParent($parentCollum);
             
             $columns[$columnName] = $column;
             
