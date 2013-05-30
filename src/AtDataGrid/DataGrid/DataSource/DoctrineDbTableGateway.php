@@ -12,6 +12,7 @@ use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Gedmo\Translatable\TranslatableListener;
 use Nette\Diagnostics\Debugger;
+use AtDataGrid\DataGrid\Column\DbReference;
 
 class DoctrineDbTableGateway extends AbstractDataSource
 {
@@ -377,25 +378,67 @@ class DoctrineDbTableGateway extends AbstractDataSource
      */
     public function fetch($listType, $order, $currentPage, $itemsPerPage, $pageRange)
     {
-    	
     	if ($listType == AbstractDataSource::LIST_TYPE_PLAIN) {
-            if ($order) {
-                $order = explode(' ', $order);
-                $this->getSelect()->orderBy($this->getEntity() . '.' . $order[0], $order[1]);
-            }
-
-            $this->getQueryBuilder()->addSelect($this->getEntity());
-            
-	        $paginator = $this->getPaginator();
-	        $paginator->setCurrentPageNumber($currentPage)
-                      ->setItemCountPerPage($itemsPerPage)
-                      ->setPageRange($pageRange);
-	        
-	        return $paginator->getItemsByPage($currentPage);
-    	} elseif ($listType == AbstractDataSource::LIST_TYPE_TREE) {
-    	    $items = $this->getTableGateway()->select();
-            return $items;
+			if ($order) {
+				
+				$columnOrder = $order['column'];
+				
+				if ($columnOrder instanceof DbReference) {
+					$columnOrderEntity = $columnOrder->getdataSource()->getEntity();
+					$this->getSelect()
+						->leftJoin($this->getEntity() . '.' . $columnOrder->getName(), 
+							$columnOrderEntity)
+						->addSelect('COUNT(' . $columnOrderEntity . '.id) AS '.$columnOrderEntity.'_cnt')
+						->groupBy($this->getEntity() . '.id')
+						->orderBy($columnOrderEntity . '_' . 'cnt', $order['direction']);
+				} else {
+					
+					
+					if($order['column']->getParent()) {
+						$columnOrderEntity = $order['column']->getdataSource()->getEntity();
+						$this->getSelect()
+						->leftJoin($this->getEntity() . '.' . $order['column']->getParent()->getName(),
+								$columnOrderEntity)
+								->groupBy($this->getEntity() . '.id')
+								->orderBy($columnOrderEntity . '.' . $order['column']->getName(), $order['direction']);
+					} else {
+						$this->getSelect()->orderBy(
+								$this->getEntity() . '.' . $columnOrder->getName(), $order['direction']);
+					}
+					
+				}
+			}
+			
+			$this->getQueryBuilder()->addSelect($this->getEntity());
+			
+			$paginator = $this->getPaginator();
+			$paginator->setCurrentPageNumber($currentPage)
+				->setItemCountPerPage($itemsPerPage)
+				->setPageRange($pageRange);
+			
+			return $paginator->getItemsByPage($currentPage);
+		} elseif ($listType == AbstractDataSource::LIST_TYPE_TREE) {
+			$items = $this->getTableGateway()->select();
+			return $items;
+		}
+    }
+    
+    protected function _createOrderQueryRecursive(\AtDataGrid\DataGrid\Column\Column $column, $direction)
+    {
+    	if($column->getParent()) {
+    		Debugger::dump($column);Exit;
+    		$columnOrderEntity = $column->getdataSource()->getEntity();
+    		$this->getSelect()
+						->leftJoin($this->getEntity() . '.' . $column->getName(), 
+							$columnOrderEntity)
+						->addSelect('COUNT(' . $columnOrderEntity . '.id) AS '.$columnOrderEntity.'_cnt')
+						->groupBy($this->getEntity() . '.id')
+						->orderBy($columnOrderEntity . '_' . 'cnt', $order['direction']);
+    	} else {
+    		$this->getSelect()->orderBy(
+    				$this->getEntity() . '.' . $columnOrder->getName(), $direction);
     	}
+    	
     }
 
     /**

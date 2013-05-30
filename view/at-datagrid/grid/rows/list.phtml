@@ -7,6 +7,10 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
 ?>
 <form method="post" action="" id="datagrid-list-form">
     <?php foreach ($this->data as $row) : 
+    
+    if(is_array($row)) {
+    	$row = current($row);
+    }
     $columnIdentifier = ucfirst($this->gridManager->getGrid()->getIdentifierColumnName());
     ?>
         <tr>

@@ -1,10 +1,21 @@
 <?php 
 use AtDataGrid\DataGrid\Column\Column;
 use Nette\Diagnostics\Debugger;
+use Zend\Json\Json;
 
 echo $this->viewGridflashMessenger; 
 
-$treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint)
+$getColumnCompleteName = function($column, $indice = 0) use(&$getColumnCompleteName){
+	if($column->getParent()) {
+		$name = $getColumnCompleteName($column->getParent(), $indice++);
+	}
+	
+	$name[] = $column->getName();
+	
+	return $name;
+};
+
+$treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumnCompleteName)
 {
 	$html = '';
 	if ($column->isVisible()) {
@@ -28,10 +39,10 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint)
 				$this->joacubBaseQueryParams(
 						array(
 							'page' => 1,
-							'order' => $column->getName() . '~' .
+							'order' => Json::encode($getColumnCompleteName($column)) . '~' .
 							$column->getOrderDirection()
 						)) . '">';
-				if ($this->grid->getCurrentOrderColumnName() == $column->getName()) {
+				if ($this->grid->getCurrentOrderColumn() == $column) {
 					$html .= '<span class="active">';
 					$html .=  $column->getLabel();
 					if ($this->grid->getCurrentOrderDirection() == 'asc') {

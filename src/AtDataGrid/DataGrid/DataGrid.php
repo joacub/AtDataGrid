@@ -6,6 +6,7 @@ use AtDataGrid\DataGrid\DataSource;
 use AtDataGrid\DataGrid\Column\Column;
 use Nette\Diagnostics\Debugger;
 use Zend\EventManager\EventManager;
+use Zend\Json\Json;
 
 /**
  * Class DataGrid
@@ -42,7 +43,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * @var null
      */
-    protected $currentOrderColumnName = null;
+    protected $currentOrderColumn = null;
 
     /**
      * @var string
@@ -404,9 +405,15 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     public function setCurrentOrderColumn($columnName, $orderDirection = 'asc')
     {
         try {
-            $column = $this->getColumn($columnName);
-
-            $this->currentOrderColumnName = $column->getName();
+        	$columnParse = Json::decode($columnName);
+        	
+        	$column = $this->getColumn(array_shift($columnParse));
+        	
+        	foreach ($columnParse as $columnName) {
+        		$column = $column->getColumn($columnName);
+        	}
+        	
+            $this->currentOrderColumn = $column;
             $this->currentOrderDirection  = $orderDirection;
 
             $column->setOrderDirection($orderDirection);
@@ -419,9 +426,9 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * @return null
      */
-    public function getCurrentOrderColumnName()
+    public function getCurrentOrderColumn()
     {
-        return $this->currentOrderColumnName;
+        return $this->currentOrderColumn;
     }
 
     /**
@@ -479,8 +486,9 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     {
         $order = null;
 
-        if ($this->getCurrentOrderColumnName()) {
-            $order = $this->getCurrentOrderColumnName() . ' ' . $this->getCurrentOrderDirection();
+        if ($this->getCurrentOrderColumn()) {
+            $order['column'] = $this->getCurrentOrderColumn();
+            $order['direction'] = $this->getCurrentOrderDirection();
         }
 
     	$this->data = $this->getDataSource()->fetch(
