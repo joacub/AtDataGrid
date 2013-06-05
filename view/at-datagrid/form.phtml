@@ -39,8 +39,8 @@ $instanceView, $strokerFormAlias)
     
     $form->prepare();
     
-    if($strokerFormAlias)
-    	$instanceView->strokerFormPrepare($strokerFormAlias);
+//     if($strokerFormAlias)
+//     	$instanceView->strokerFormPrepare($strokerFormAlias);
     echo $instanceView->formTwb()->openTag($form, $formType);
 	?>
     <?php
@@ -168,6 +168,7 @@ $(document).ready(function(){
 });
 
 $('#tabslangs a').on('shown', function (e) {
+	$('#tabslangs a').trigger('start', [e]);
     var parts = $(this).attr('href').split('#');
     
     var relateTarget = e.relatedTarget + '';
@@ -187,10 +188,11 @@ $('#tabslangs a').on('shown', function (e) {
     	    $tab.html(content);
     	    $tab.height('auto');
     	    $(this).contents().find('body').find("script:contains(\"validate\")").each(function(i) {
-                eval($(this).text());
+                //eval($(this).text());
             });
 
             $tab.unblock();
+            $('#tabslangs a').trigger('end', [e]);
     	});
     	
     	$('body').append(iframe);
