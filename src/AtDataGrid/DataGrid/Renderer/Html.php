@@ -5,6 +5,8 @@ namespace AtDataGrid\DataGrid\Renderer;
 use Zend\View\Renderer\RendererInterface;
 use Zend\View\Model\ViewModel;
 use Zend\Mvc\View\Http\InjectTemplateListener;
+use Nette\Diagnostics\Debugger;
+use Zend\Filter\Word\CamelCaseToDash;
 
 /**
  * Class Html
@@ -109,13 +111,7 @@ class Html extends AbstractRenderer
         $engine = $this->getEngine();
         
         $sm = $this->getServiceManager();
-        $controller = $sm->get('application');
-        $controller instanceof \Zend\Mvc\Application;
-        $controller->getMvcEvent()->setResult(new ViewModel());
-        $injectTemplateListener  = new InjectTemplateListener();
-        $injectTemplateListener->injectTemplate($controller->getMvcEvent());
-        $model = $controller->getMvcEvent()->getResult();
-        $originalTemplateBase = dirname($model->getTemplate());
+        $originalTemplateBase = $variables['gridManager']->getOriginalTemplateBase();
         
         $viewResolver = $engine->resolver();
         

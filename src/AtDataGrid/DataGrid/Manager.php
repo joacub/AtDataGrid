@@ -420,4 +420,17 @@ class Manager
     {
     	return $this->sl;
     }
+    
+    protected $originalTemplateBase;
+    
+    public function setOriginalTemplateBase($originalTemplateBase)
+    {
+    	$this->originalTemplateBase = $originalTemplateBase;
+    	return $this;
+    }
+    
+    public function getOriginalTemplateBase()
+    {
+    	return $this->originalTemplateBase;	
+    }
 }
