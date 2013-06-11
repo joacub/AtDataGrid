@@ -206,17 +206,19 @@ class Manager
     {
     	// Collect elements
     	foreach ($this->getGrid()->getColumns() as $column) {
+    		
+    		$formElement = false;
+    		if($form->has($column->getName())) {
+    			$formElement = $form->get($column->getName());
+    		}
     		 
-    		 
-    		$formElement = $form->get($column->getName());
-    
     		if(!$formElement) {
     			$fieldsets = $form->getFieldsets();
-    			 
     			foreach($fieldsets as $fieldset) {
-    				$formElement = $fieldset->get($column->getName());
-    				if($formElement)
+    				if($fieldset->has($column->getName())) {
+    					$formElement = $fieldset->get($column->getName());
     					break;
+    				}
     			}
     		}
     
