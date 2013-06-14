@@ -7,6 +7,7 @@ use Zend\Form\Form;
 use Zend\Form\FormInterface;
 use Zend\ServiceManager\ServiceManager;
 use Nette\Diagnostics\Debugger;
+use Zend\Http\Response;
 
 /**
  * Class Manager
@@ -250,8 +251,8 @@ class Manager
     		}
     		 
     	}
-    	 
-    	if(!$this->getserviceManager()->get('response')->getHeaders()->has('ZfJoacubFormJqueryValidate')) {
+    	$response = $this->getserviceManager()->get('response');
+    	if(!$response instanceof Response || !$response->getHeaders()->has('ZfJoacubFormJqueryValidate')) {
     		//Hash element to prevent CSRF attack
     		$csrf = new \Zend\Form\Element\Csrf('hash');
     		$form->add($csrf);
