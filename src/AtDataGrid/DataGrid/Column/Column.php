@@ -85,7 +85,7 @@ class Column
     /**
      * @param $name
      */
-    public function __construct($name, $dataSource)
+    public function __construct($name, $dataSource = null)
     {
         $this->setName($name);
 
@@ -308,6 +308,12 @@ class Column
     	}
     	
     	return false;
+    }
+    
+    public function clearDecorators()
+    {
+    	$this->decorators = array();
+    	return $this;
     }
 
     /**

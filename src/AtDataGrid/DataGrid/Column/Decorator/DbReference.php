@@ -58,7 +58,12 @@ class DbReference extends AbstractDecorator
 			$models = array();
 			foreach($columns as $column) {
 				if($column->isVisible()) {
-					$models[] = $column->render($value->{"get{$column->getName()}"}());
+					if($value instanceof PersistentCollection) {
+						$models[] = $column->render($value);
+					} else {
+						$name = ucfirst($column->getName());
+						$models[] = $column->render($value->{"get{$name}"}());
+					}
 				}
 			}
 			
