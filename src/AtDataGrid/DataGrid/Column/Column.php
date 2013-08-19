@@ -181,6 +181,17 @@ class Column
     {
         return $this->visible;
     }
+    
+    public function isContainVisibleColumns()
+    {
+    	$columns = $this->getColumns();
+    	foreach((array) $columns as $column) {
+    		if($column->isVisible())
+    			return true;
+    	}
+    	
+    	return false;
+    }
 
     /**
      * @param bool $value

@@ -18,7 +18,7 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
                 <input class="grid-table-checker" type="checkbox" value="<?php echo $row->{"get" . $columnIdentifier}() ?>" id="item_id_<?php echo $row->{"get" . $columnIdentifier}() ?>" name="items[]"/>
             </td>
 
-            <?php foreach ($this->columns as $collumn) : ?>
+            <?php foreach ($this->grid as $collumn) : ?>
             
                 <?php if (isset($collumn) && $collumn->isVisible()): ?>
                 

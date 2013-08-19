@@ -34,6 +34,12 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @var array
      */
     protected $columns = array();
+    
+    /**
+     * 
+     * @var array
+     */
+    protected $columnsOrderer = array();
 
     /**
      * @var string
@@ -91,7 +97,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @var array
      */
     protected $dataPanels = array();
-
+    
     /**
      * @param $dataSource
      * @param array $options
@@ -840,7 +846,50 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->columns);
+    	$tmpOrderer = $this->columnsOrderer;
+    	foreach($this->columns as $k => $v) {
+    		if($v->isVisible())
+    		$tmpColumns[$k] = $v;
+    	}
+    	
+    	foreach($tmpOrderer as $column) {
+    		unset($tmpColumns[$column->getName()]);
+    	}
+    	
+    	$newColumns = array();
+    	
+    	$i = 0;
+    	while(1) {
+    		if(empty($tmpOrderer))
+    			break;
+    		current($tmpOrderer);
+    		$k = key($tmpOrderer);
+    		if($k != $i) {
+    			$i++;
+    			if(empty($tmpColumns))
+    				continue;
+    			$column = array_shift($tmpColumns);
+    			$newColumns[$column->getName()] = $column;
+    			unset($tmpColumns[$column->getName()]);
+    			continue;
+    		}
+    		
+    		$column = $tmpOrderer[$k];
+    		$newColumns[$column->getName()] = $column;
+    		if(isset($tmpColumns[$column->getName()]))
+    			unset($tmpColumns[$column->getName()]);
+    		
+    		unset($tmpOrderer[$k]);
+    		$i++;
+    		
+    	}
+    	
+    	foreach($tmpColumns as $column) {
+    		$newColumns[$column->getName()] = $column;
+    	}
+    	
+    	
+        return new \ArrayIterator($newColumns);
     }
     
     public function setTitleColumnName($name)
@@ -856,5 +905,11 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     public function getTitleColumnName()
     {
     	return $this->titleColumnName;
+    }
+    
+    public function setOrderColumn($orderColumn, $column)
+    {
+    	$this->columnsOrderer[$orderColumn] = $column;
+    	ksort($this->columnsOrderer);
     }
 }
