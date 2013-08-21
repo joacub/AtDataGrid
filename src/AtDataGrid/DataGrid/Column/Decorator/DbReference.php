@@ -39,10 +39,6 @@ class DbReference extends AbstractDecorator
 	 */
 	public function render ($value)
 	{
-		if (! $value) {
-			return '';
-		}
-		
 		$containsColumns = false;
 		$columns = $this->column->getColumns();
 		foreach((array) $columns as $column) {

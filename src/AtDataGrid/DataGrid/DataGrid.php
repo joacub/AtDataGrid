@@ -279,7 +279,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      *
      * @param $name
      * @throws \Exception
-     * @return \AtDataGrid\Datagrid\Column
+     * @return Column
      */
     public function getColumn($name)
     {
