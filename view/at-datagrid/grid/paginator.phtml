@@ -1,36 +1,35 @@
-<div class="container-buttons-pagination">
+   <div class="container-buttons-pagination">
 <div class="btn-toolbar">
+   
     <div class="btn-group">
-            <button class="btn disabled"><i class="icon-eye-open"></i>&nbsp;&nbsp; <?php echo $this->translate('View')?> </button>
-                <? if ($this->grid->getItemsPerPage() == 20): ?>
-                    <button class="btn active">20</button>
-                <? else: ?>
-                    <a class="btn" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 20)) ?>">20</a>
-                <? endif; ?>
-                <? if ($this->grid->getItemsPerPage() == 30): ?>
-                    <button class="btn active">30</button>
-                <? else: ?>
-                    <a class="btn" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 30)) ?>">30</a>
-                <? endif; ?>
-                <? if ($this->grid->getItemsPerPage() == 50): ?>
-                    <button class="btn active">50</button>
-                <? else: ?>
-                    <a class="btn" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 50)) ?>">50</a>
-                <? endif; ?>
-                <? if ($this->grid->getItemsPerPage() == 100): ?>
-                    <button class="btn active">100</button>
-                <? else: ?>
-                    <a class="btn" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 100)) ?>">100</a>
-                <? endif; ?>
+            <button class="btn btn-default-default disabled"><i class="icon-eye-open"></i>&nbsp;&nbsp; <?php echo $this->translate('View')?> </button>
+                <?php if ($this->grid->getItemsPerPage() == 20): ?>
+                    <button class="btn btn-default active">20</button>
+                <?php else: ?>
+                    <a class="btn btn-default" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 20)) ?>">20</a>
+                <?php endif; ?>
+                <?php if ($this->grid->getItemsPerPage() == 30): ?>
+                    <button class="btn btn-default active">30</button>
+                <?php else: ?>
+                    <a class="btn btn-default" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 30)) ?>">30</a>
+                <?php endif; ?>
+                <?php if ($this->grid->getItemsPerPage() == 50): ?>
+                    <button class="btn btn-default active">50</button>
+                <?php else: ?>
+                    <a class="btn btn-default" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 50)) ?>">50</a>
+                <?php endif; ?>
+                <?php if ($this->grid->getItemsPerPage() == 100): ?>
+                    <button class="btn btn-default active">100</button>
+                <?php else: ?>
+                    <a class="btn btn-default" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 100)) ?>">100</a>
+                <?php endif; ?>
 
-            <button class="btn disabled"><?php echo $this->translate('records per page') ?></button>
+            <button class="btn btn-default disabled"><?php echo $this->translate('records per page') ?></button>
 
-            <button class="btn disabled">Total: <span class="b"><?php echo $this->paginator->getTotalItemCount(); ?></span> <?php echo $this->translate('record(s) found') ?></button>
+            <button class="btn btn-default disabled">Total: <span class="b"><?php echo $this->paginator->getTotalItemCount(); ?></span> <?php echo $this->translate('record(s) found') ?></button>
     </div>
-    
-</div>
-<?php 
+    </div>
+<?php
 echo $this->paginationControl($this->paginator, null, $this->viewGridPaginationControl); ?>
 </div>
-
 <br style="clear:both;">

@@ -5,11 +5,9 @@
 
 /* Grid filters */
 .atf-grid table .filters {background-color: #E3EFF1; font-size: 0.9em;}
-.atf-grid table .filters td div {vertical-align: top; white-space: nowrap;}
-.atf-grid table .filters td input {width: 92%; height: 20px; margin: 4px 0;}
-.atf-grid table .filters td select {margin: 4px 0; width: 100%}
-.atf-grid table .filters td input[type=submit] {width: 100%;}
 .atf-grid table .filters td div {clear: both;}
+.atf-grid table .filters .form-control {width: 92%;}
+.atf-grid table .actions {width: 100px;}
 
 /* Sorting */
 a.sortable:hover {text-decoration: none;}
@@ -39,6 +37,7 @@ a.sortable:hover {text-decoration: none;}
 
 /* pagination */
 .container-buttons-pagination .btn-toolbar {
+	margin-top:20px;
 	margin-right:20px;
 	float:left;
 }

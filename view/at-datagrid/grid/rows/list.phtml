@@ -42,15 +42,16 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
             <td>
                 <div class="btn-group pull-right">
                     <?php foreach($this->gridManager->getButtonActions() as $action) : ?>
-                        <a class="btn btn-small" href="<?php echo $this->url(null, array('action' => $action['action'], 'id' => $row->{"get" . $columnIdentifier}() ), array(), true) ?>"
+                        <a data-toggle="tooltip" data-container="body" title="<?php echo $this->translate($action['label']) ?>" class="btn btn-default btn-small" href="<?php echo $this->url(null, array('action' => $action['action'], 'id' => $row->{"get" . $columnIdentifier}() ), array(), true) ?>"
                             <?php if (isset($action['confirm-message'])): ?>
                             onclick="return DataGrid.confirmAction(this, '<?php echo $action['confirm-message'] ?>')"
                             <?php endif;?>>
-                            <i title="<?php echo $this->translate($action['label']) ?>" class="<?php echo $action['class'] ?>"></i>
+                            <i class="<?php echo $action['class'] ?>"></i>
                         </a>
                     <?php endforeach; ?>
-                    <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-                    <ul class="dropdown-menu">
+                    <div class="btn-group">
+                    <a class="btn btn-default btn-small dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
                         <?php foreach($this->gridManager->getActions() as $action) : ?>
                             <?php if ($action['button'] == false): ?>
                             <li>
@@ -65,6 +66,7 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </ul>
+                    </div>
                 </div>
             </td>
         </tr>

@@ -1,12 +1,13 @@
 <?php
-
 use AtDataGrid\DataGrid\Column\Column;
 use Nette\Diagnostics\Debugger;
 use Zend\Form\Form;
 
 $form = $this->grid->getFiltersForm();
 $form->prepare();
-$form->setAttribute('action', $this->url(null, array('action' => 'list')));
+$form->setAttribute('action', $this->url(null, array(
+	'action' => 'list'
+)));
 $form->setAttribute('method', 'get');
 $form->setAttribute('id', 'datagrid-filters-form');
 
@@ -14,38 +15,61 @@ $this instanceof Zend\View\Renderer\PhpRenderer;
 $filtersClean = array();
 echo $this->form()->openTag($form);
 
-$treeColumnsPrint = function (Column $column, $form) use(&$treeColumnsPrint, $filtersClean) {
+$treeColumnsPrint = function  (Column $column, $form) use( &$treeColumnsPrint, 
+$filtersClean)
+{
 	$html = '';
 	if ($column->isVisible()) {
 		
 		$columns = (array) $column->getcolumns();
 		$visibleSubcolumns = array();
 		foreach ($columns as $_column) {
-			if($_column->isVisible()) {
+			if ($_column->isVisible()) {
 				$visibleSubcolumns[] = $_column;
 			}
-		
 		}
 		
-		if($columns && count($visibleSubcolumns) > 0) {
-			foreach($visibleSubcolumns as $_column) {
+		if ($columns && count($visibleSubcolumns) > 0) {
+			foreach ($visibleSubcolumns as $_column) {
 				
 				$form instanceof Form;
 				$fieldset = $form->getFieldsets();
-				$html .= $treeColumnsPrint($_column, $fieldset[$column->getName()]);
+				$html .= $treeColumnsPrint($_column, 
+						$fieldset[$column->getName()]);
 			}
 		} else {
 			$html .= '<td>';
 			if ($column->hasFilters()) {
 				foreach ($column->getFilters() as $filter) {
 					$filtersClean[$filter->getName()] = null;
-					$html .= $this->formElement($form->get($filter->getName()));
-					$html .= $this->formElementErrors($form->get($filter->getName()));
+					$html .= '<div class="row">
+							  <div class="col-lg-12">
+							    <div class="input-group">
+							      <div class="input-group-btn" data-toggle="tooltip" data-container="body"  title="Elije que acciones ejecutar al filtrar">
+							        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i> <span class="caret"></span></button>
+							        <ul class="dropdown-menu">
+							          <li><a href="#">Action</a></li>
+							          <li><a href="#">Another action</a></li>
+							          <li><a href="#">Something else here</a></li>
+							          <li class="divider"></li>
+							          <li><a href="#">Separated link</a></li>
+							        </ul>
+							      </div><!-- /btn-group -->';
+					$html .= $this->formElement(
+							$form->get($filter->getName())
+								->setAttribute('class', 'form-control'));
+					$html .= $this->formElementErrors(
+							$form->get($filter->getName()));
+					$html .= ' </div><!-- /input-group -->
+							  			</div><!-- /.col-lg-6 --> 
+									</div><!-- /btn-group -->
+							    </div><!-- /input-group -->
+							  </div><!-- /.col-lg-6 -->
+							</div><!-- /.row -->';
 				}
 			}
 			$html .= '</td>';
 		}
-		
 	}
 	
 	return $html;
@@ -53,16 +77,26 @@ $treeColumnsPrint = function (Column $column, $form) use(&$treeColumnsPrint, $fi
 
 ?>
 
-    <tr class="filters">
-        <td><!--  --></td>
+<tr class="filters">
+	<td>
+		<!--  -->
+	</td>
         <?php foreach ($this->grid as $column) : ?>
            <?php echo $treeColumnsPrint($column, $form); ?>
         <?php endforeach; ?>
         <td>
-            <div class="btn-group right">
-                <button class="btn btn-info btn-small" type="submit" title="<?php echo $this->translate('Apply filters'); ?>"><i class="icon-search icon-white"></i></button>
-                <a class="btn btn-danger btn-small" href="<?php echo $this->url(null, array('id' => $this->getHelperPluginManager()->getServiceLocator()->get('controllerpluginmanager')->get('params')->fromRoute('id', 0)) + $filtersClean, true)?>" title="<?php echo $this->translate('Reset filters'); ?>"><i class="icon-remove icon-white"></i></a>
-            </div>
-        </td>
-    </tr>
+		<div class="btn-group right">
+			<button data-toggle="tooltip" data-container="body"
+				class="btn btn-info btn-small" type="submit"
+				title="<?php echo $this->translate('Aplicar filtros'); ?>">
+				<i class="glyphicon glyphicon-search"></i>
+			</button>
+			<a data-toggle="tooltip" data-container="body"
+				class="btn btn-danger btn-small"
+				href="<?php echo $this->url(null, array('id' => $this->getHelperPluginManager()->getServiceLocator()->get('controllerpluginmanager')->get('params')->fromRoute('id', 0)) + $filtersClean, true)?>"
+				title="<?php echo $this->translate('Limpiar filtros'); ?>"><i
+				class="glyphicon glyphicon-remove"></i></a>
+		</div>
+	</td>
+</tr>
 <?php echo $this->form()->closeTag(); ?>
