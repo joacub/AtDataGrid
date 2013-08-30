@@ -48,12 +48,12 @@ $filtersClean)
 							      <div class="input-group-btn" data-toggle="tooltip" data-container="body"  title="Elije que acciones ejecutar al filtrar">
 							        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i> <span class="caret"></span></button>
 							        <ul class="dropdown-menu">
-							          <li><a href="#">Action</a></li>
-							          <li><a href="#">Another action</a></li>
-							          <li><a href="#">Something else here</a></li>
-							          <li class="divider"></li>
-							          <li><a href="#">Separated link</a></li>
+							          <li><a data-value="Equal" href="#">Igual que</a></li>
+							          <li><a data-value="GreaterThan" href="#">Mayor que</a></li>
+							          <li><a data-value="LessThan" href="#">Menor que</a></li>
+							          <li><a data-value="Like" href="#">Que contenga</a></li>
 							        </ul>
+									<input type="hidden" name="typeFilter['.$filter->getName().']">
 							      </div><!-- /btn-group -->';
 					$html .= $this->formElement(
 							$form->get($filter->getName())

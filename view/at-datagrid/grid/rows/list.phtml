@@ -59,6 +59,7 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
                                     <?php if (isset($action['confirm-message'])): ?>
                                         onclick="return DataGrid.confirmAction(this, '<?php echo $action['confirm-message'] ?>')"
                                     <?php endif;?>>
+                                    <i class="<?php echo $action['class'] ?>"></i>
                                     <?php echo isset($actionsIcons[$action['action']]) ? $actionsIcons[$action['action']] : '' ?>
                                     <?php echo $this->translate($action['label']) ?>
                                 </a>

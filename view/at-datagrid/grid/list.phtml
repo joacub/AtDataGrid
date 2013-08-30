@@ -118,5 +118,6 @@ $('.filters .dropdown-menu li').click(function(e) {
 	e.preventDefault();
 	$(this).closest('ul').find('li').removeClass('active');
 	$(this).addClass('active');
+	$(this).closest('div').find('input').val($(this).find('a').data('value'));
 });
 </script>

@@ -51,8 +51,8 @@ class Manager
      * @var array
      */
     protected $actions = array(
-        'edit'   => array('action' => 'edit', 'label' => 'View & Edit', 'bulk' => false, 'button' => true, 'class' => 'glyphicon glyphicon-eye-open'),
-        'delete' => array('action' => 'delete', 'label' => 'Delete', 'confirm-message' => 'Are you sure?', 'bulk' => true, 'button' => false)
+        'edit'   => array('action' => 'edit', 'label' => 'Ver y Editar', 'bulk' => false, 'button' => true, 'class' => 'glyphicon glyphicon-eye-open'),
+        'delete' => array('action' => 'delete', 'label' => 'Eliminar', 'confirm-message' => '¿ Estas seguro ?', 'bulk' => true, 'button' => false, 'class' => 'glyphicon glyphicon-remove')
     );
     
     protected $sl;
