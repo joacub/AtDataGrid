@@ -46,13 +46,14 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumn
 					$html .= '<span class="active">';
 					$html .=  $column->getLabel();
 					if ($this->grid->getCurrentOrderDirection() == 'asc') {
-						$html .= '&uarr;';
+						$html .= ' <i class="glyphicon glyphicon-sort-by-alphabet"></i>';
 					} elseif ($this->grid->getCurrentOrderDirection() == 'desc') {
-						$html .= '&darr;';
+						$html .= ' <i class="glyphicon glyphicon-sort-by-alphabet-alt"></i>';
 					}
 					$html .= '</span>';
 				} else {
 					$html .= $column->getLabel();
+					$html .= ' <i class="glyphicon glyphicon-sort"></i>';
 				}
 				$html .= '</a>';
 			} else {
