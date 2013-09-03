@@ -49,6 +49,11 @@ $instanceView, $strokerFormAlias)
 	foreach ($form->getElements() as $element) :
 		
           $options = $element->getOption('ckeditor');
+	
+		if($element->getOption('JoacubUploader')) {
+			$allOptions = $element->getOptions();
+			$element->setOptions(array('control-class' => 'col-lg-12') + $allOptions);
+		}
           
           if($element->getOption('displayOptions'))
           	$displayOptions['elements'][$element->getName()] = $element->getOption('displayOptions');

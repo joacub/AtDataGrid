@@ -49,7 +49,7 @@ class DbReference extends AbstractDecorator
 		}
 		
 		$allEntities = $this->dataSource->getEm()->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
-		
+	
 		if($containsColumns) {
 			$models = array();
 			foreach($columns as $column) {

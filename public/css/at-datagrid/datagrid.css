@@ -47,3 +47,9 @@ a.sortable:hover {text-decoration: none;}
 	margin-top:11px;
 }
 
+
+/* edit forms */
+.tab-content {
+	padding-top: 20px;
+}
+

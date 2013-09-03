@@ -2,6 +2,7 @@
 
 namespace AtDataGrid\DataGrid\Column\Decorator;
 
+use Nette\Diagnostics\Debugger;
 class Literal extends AbstractDecorator
 {
     /**

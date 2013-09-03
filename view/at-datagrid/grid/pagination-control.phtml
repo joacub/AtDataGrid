@@ -5,12 +5,12 @@ if ($this->pageCount): ?>
 
         <!-- First page link -->
         <li<?php echo (isset($this->previous)) ? '' : ' class="disabled"'; ?>>
-            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->first)); ?>">&laquo; First</a>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->first)); ?>">&laquo; Primera</a>
         </li>
 
         <!-- Previous page link -->
         <li<?php echo (isset($this->previous)) ? '' : ' class="disabled"'; ?>>
-            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->previous-9)); ?>">&lsaquo; Previous 10</a>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->previous-9)); ?>">&lsaquo; Anterior</a>
         </li>
 
         <!-- Numbered page links -->
@@ -22,12 +22,12 @@ if ($this->pageCount): ?>
 
         <!-- Next page link -->
         <li<?php echo (isset($this->next)) ? '' : ' class="disabled"'; ?>>
-            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->previous+9)); ?>">Next 10 &rsaquo;</a>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->previous+9)); ?>">Siguiente &rsaquo;</a>
         </li>
 
         <!-- Last page link -->
         <li<?php echo (isset($this->next)) ? '' : ' class="disabled"'; ?>>
-            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->last)); ?>">Last &raquo;</a>
+            <a href="<?php echo $this->joacubBaseQueryParams(array('page' => $this->last)); ?>">Última &raquo;</a>
         </li>
 
     </ul>

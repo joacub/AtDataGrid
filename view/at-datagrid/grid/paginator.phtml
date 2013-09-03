@@ -2,7 +2,7 @@
 <div class="btn-toolbar">
    
     <div class="btn-group">
-            <button class="btn btn-default-default disabled"><i class="icon-eye-open"></i>&nbsp;&nbsp; <?php echo $this->translate('View')?> </button>
+            <button class="btn btn-default-default disabled"><i class="icon-eye-open"></i>&nbsp;&nbsp; <?php echo $this->translate('Ver')?> </button>
                 <?php if ($this->grid->getItemsPerPage() == 20): ?>
                     <button class="btn btn-default active">20</button>
                 <?php else: ?>
@@ -24,9 +24,9 @@
                     <a class="btn btn-default" href="<?php echo $this->joacubBaseQueryParams(array('show_items' => 100)) ?>">100</a>
                 <?php endif; ?>
 
-            <button class="btn btn-default disabled"><?php echo $this->translate('records per page') ?></button>
+            <button class="btn btn-default disabled"><?php echo $this->translate('Registros por página') ?></button>
 
-            <button class="btn btn-default disabled">Total: <span class="b"><?php echo $this->paginator->getTotalItemCount(); ?></span> <?php echo $this->translate('record(s) found') ?></button>
+            <button class="btn btn-default disabled">Total: <span class="b"><?php echo $this->paginator->getTotalItemCount(); ?></span> <?php echo $this->translatePlural('registro encontrado', 'registros encontrados', $this->paginator->getTotalItemCount()) ?></button>
     </div>
     </div>
 <?php

@@ -1,1 +1,13 @@
+<?php 
+
+use Zend\Form\Element\Select;
+use Nette\Diagnostics\Debugger;
+$element = $column->getFormElement();
+
+if($element instanceof Select) {
+	$values = $element->getValueOptions();
+	if(isset($values[$value]))
+		$value = $values[$value];
+}
+?>
 <td class="<?php echo 'col-' . $column->getName() ?>"><?php echo $value ?></td>

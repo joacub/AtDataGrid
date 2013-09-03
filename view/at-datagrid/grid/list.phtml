@@ -72,8 +72,8 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumn
 <h2><?php echo $this->translate($this->grid->getCaption()) ?></h2>
 <?php if ($this->gridManager->isAllowCreate()): ?>
 <a class="btn btn-warning"
-	href="<?php echo $this->url(null, array('action' => 'create'), array(), true) ?>"><?php echo $this->translate('Crear nuevo') ?> <i
-	class="icon-plus-sign"></i></a>
+	href="<?php echo $this->url(null, array('action' => 'create'), array(), true) ?>"><i
+	class="glyphicon glyphicon-plus-sign"></i> <?php echo $this->translate('Crear nuevo') ?> </a>
 <?php endif; ?>
 
         <?php echo $this->viewGridPaginator; ?>

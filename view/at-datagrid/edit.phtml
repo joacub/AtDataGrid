@@ -20,8 +20,10 @@ $actionsIcons = array(
 <?php echo $this->render('at-datagrid/item/info')?>
 
 <div class="btn-group right pull-right">
-	<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><?php echo $this->translate('actions')?> <span
-		class="caret"></span></a>
+	<button type="button" class="btn btn-danger"><i class="glyphicon glyphicon-cog"></i> <?php echo $this->translate('Acciones')?></button>
+	  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+	    <span class="caret"></span>
+	  </button>
 	<ul class="dropdown-menu">
                 <?php foreach($this->gridManager->getActions() as $action) : ?>
                     <li><a href=""

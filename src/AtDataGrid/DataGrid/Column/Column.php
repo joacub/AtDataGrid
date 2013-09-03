@@ -4,6 +4,7 @@ namespace AtDataGrid\DataGrid\Column;
 
 use AtDataGrid\DataGrid\Column\Decorator;
 use Nette\Diagnostics\Debugger;
+use Zend\View\Model\ViewModel;
 
 class Column
 {
@@ -335,8 +336,12 @@ class Column
     public function render($value, $row = null)
     {
         foreach ($this->decorators as $decorator) {
+        	if($value instanceof ViewModel) {
+        		$value = $value->getVariable('value');
+        	}
             $value = $decorator->render($value, $row, $this->dataSource);    
         }
+        
         return $value;
     }
     
