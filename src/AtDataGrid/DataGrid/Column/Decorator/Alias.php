@@ -32,11 +32,11 @@ class Alias extends AbstractDecorator
     public function render($value)
     {
         if (!isset($this->renameTo)) {
-            return parent::render($value->getVariable('value'));
+            return parent::render($value);
         }
         
-        if (isset($this->renameTo[$value->getVariable('value')])) {
-            return parent::render($this->renameTo[$value->getVariable('value')]);
+        if (isset($this->renameTo[$value])) {
+            return parent::render($this->renameTo[$value]);
         }
         
         return $value;
