@@ -37,7 +37,7 @@ class DateFormat extends AbstractDecorator
      * @param  $row
      * @return string
      */
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
     	if($value instanceof \DateTime) {
            return parent::render($value->format($this->format));

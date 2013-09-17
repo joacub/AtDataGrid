@@ -29,10 +29,10 @@ class Alias extends AbstractDecorator
      * @param $row
      * @return
      */
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
         if (!isset($this->renameTo)) {
-            return parent::render($value);
+            return parent::render($value, $row = false, $dataSource = false);
         }
         
         if (isset($this->renameTo[$value])) {

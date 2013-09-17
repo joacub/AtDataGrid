@@ -71,7 +71,7 @@ class Html extends AbstractDecorator
     /**
      * Render escaping the value
      */
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
         return parent::render($this->escape($value));
     }

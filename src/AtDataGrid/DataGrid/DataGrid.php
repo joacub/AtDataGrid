@@ -229,9 +229,9 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @return DataGrid
      * @throws \Exception
      */
-    public function addColumn(Column $column, $overwrite = false)
+    public function addColumn(Column $column, $overwrite = false, $forceCreate = false)
     {
-        if ( (false == $overwrite) && ($this->isColumn($column)) ) {
+        if ( (false == $overwrite) && (false === $forceCreate && $this->isColumn($column)) ) {
             throw new \Exception('Column `' . $column->getName() . '` already in a column list. Use other name.');
         }    
         
@@ -287,7 +287,11 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
             return $this->columns[$name];
         }
         
-        throw new \Exception("Column '" . $name . "' doesn't exist in column list.");
+        $columnName = array();
+        foreach($this->columns as $columnName => $column)
+            $columns[] = $columnName;
+        
+        throw new \Exception("Column '" . $name . "' doesn't exist in column list => " . implode(', ', $columns));
     }
 
     /**

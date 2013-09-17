@@ -5,6 +5,7 @@ namespace AtDataGrid\DataGrid\Column;
 use AtDataGrid\DataGrid\Column\Decorator;
 use Nette\Diagnostics\Debugger;
 use Zend\View\Model\ViewModel;
+use Zend\Debug\Debug;
 
 class Column
 {
@@ -531,7 +532,11 @@ class Column
             return $this->columns[$name];
         }
         
-        throw new \Exception("Column '" . $name . "' doesn't exist in column list.");
+        $columns = array();
+        foreach($this->columns as $columName => $column)
+            $columns[] = $columName;
+        
+        throw new \Exception("Column '" . $name . "' doesn't exist in column list => " . implode(', ', $columns));
     }
     
     public function getColumns()

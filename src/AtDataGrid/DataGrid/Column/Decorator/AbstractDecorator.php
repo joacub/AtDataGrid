@@ -72,7 +72,7 @@ abstract class AbstractDecorator implements DecoratorInterface
         return $this->separator;
     }
     
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
     	$viewModel = new ViewModel();
     	

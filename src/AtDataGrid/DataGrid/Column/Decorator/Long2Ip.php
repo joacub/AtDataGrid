@@ -9,7 +9,7 @@ class Long2Ip extends AbstractDecorator
      * @param $row
      * @return string
      */
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
         if ($value) {
             return parent::render(long2ip($value));

@@ -35,7 +35,7 @@ class BitMask extends AbstractDecorator
      * @param $row
      * @return string
      */
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
         $str = '';
         foreach ($this->statuses as $name => $status) {

@@ -17,12 +17,12 @@ class Closure extends AbstractDecorator
     /**
      * Render escaping the value
      */
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
     	$closure = $this->closure;
     	
-    	$value = $closure($value);
+    	$value = $closure($value, $row, $dataSource);
     	
-        return parent::render($value);
+        return parent::render($value, $row = false, $dataSource = false);
     }
 }

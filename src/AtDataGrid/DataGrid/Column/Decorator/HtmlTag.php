@@ -47,7 +47,7 @@ class HtmlTag extends AbstractDecorator
      * @param $value
      * @return string
      */
-    public function render($value)
+    public function render($value, $row = false, $dataSource = false)
     {
         $tag = $this->getTag();
         $content = '<' . $tag . '>' . $value . '</' . $tag . '>';
