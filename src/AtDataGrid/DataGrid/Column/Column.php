@@ -560,4 +560,15 @@ class Column
     {
     	return $this->dataSource;
     }
+    
+    protected $canHide = true;
+    public function setCanHide($flag = true)
+    {
+    	$this->canHide = $flag;
+    }
+    
+    public function getCanHide()
+    {
+    	return $this->canHide;
+    }
 }

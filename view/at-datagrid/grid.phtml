@@ -1,4 +1,5 @@
 <?php $this->headScript()->appendFile($this->basePath() . '/js/at-datagrid/datagrid.js') ?>
+<?php $this->headScript()->appendFile($this->basePath() . '/js/at-datagrid/jquery.cookie.js') ?>
 <?php $this->headLink()->appendStylesheet($this->basePath() . '/css/at-datagrid/datagrid.css') ?>
 
 <?php echo $this->gridManager->render(); ?>

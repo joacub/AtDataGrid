@@ -2,6 +2,7 @@
 use AtDataGrid\DataGrid\Column\Column;
 use Nette\Diagnostics\Debugger;
 use Zend\Form\Form;
+use Zend\Json\Json;
 
 $form = $this->grid->getFiltersForm();
 $form->prepare();
@@ -15,8 +16,23 @@ $this instanceof Zend\View\Renderer\PhpRenderer;
 $filtersClean = array();
 echo $this->form()->openTag($form);
 
+$getColumnCompleteName = function($column, $indice = 0) use(&$getColumnCompleteName){
+	if($column->getParent()) {
+		$name = $getColumnCompleteName($column->getParent(), $indice++);
+	}
+
+	$name[] = $column->getName();
+
+	return $name;
+};
+
+$isHide = function($column) use($getColumnCompleteName) {
+	$idColumn = md5(Json::encode($getColumnCompleteName($column)));
+	return (empty($_COOKIE['columnshide-'.$idColumn]) && isset($_COOKIE['columnshide-'.$idColumn]));
+};
+
 $treeColumnsPrint = function  (Column $column, $form) use( &$treeColumnsPrint, 
-$filtersClean)
+$filtersClean, $isHide)
 {
 	$html = '';
 	if ($column->isVisible()) {
@@ -38,7 +54,7 @@ $filtersClean)
 						$fieldset[$column->getName()]);
 			}
 		} else {
-			$html .= '<td>';
+			$html .= '<td '.($isHide($column) ? 'style="display:none;"' : '').' >';
 			if ($column->hasFilters()) {
 				foreach ($column->getFilters() as $filter) {
 					$filtersClean[$filter->getName()] = null;

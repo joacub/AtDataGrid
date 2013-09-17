@@ -15,7 +15,12 @@ $getColumnCompleteName = function($column, $indice = 0) use(&$getColumnCompleteN
 	return $name;
 };
 
-$treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumnCompleteName)
+$isHide = function($column) use($getColumnCompleteName) {
+	$idColumn = md5(Json::encode($getColumnCompleteName($column)));
+	return (empty($_COOKIE['columnshide-'.$idColumn]) && isset($_COOKIE['columnshide-'.$idColumn]));
+};
+
+$treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumnCompleteName, $isHide)
 {
 	$html = '';
 	if ($column->isVisible()) {
@@ -33,7 +38,7 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumn
 			foreach($visibleSubcolumns as $_column)
 				$html .= $treeColumnsPrint($_column);
 		} else {
-			$html .= '<th>';
+			$html .= '<th '.($isHide($column) ? 'style="display:none;"' : '').' data-columnid="'.md5(Json::encode($getColumnCompleteName($column))).'">';
 			if ($column->isSortable()) {
 				$html .= '<a class="sortable" href="' .
 				$this->joacubBaseQueryParams(
@@ -67,8 +72,74 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumn
 	return $html;
 };
 
-?>
+$treeColumnsPrintCanHide = function (Column $column) use(&$treeColumnsPrintCanHide, $getColumnCompleteName, $isHide)
+{
+	$html = '';
+	if ($column->isVisible()) {
+		$columns = (array) $column->getColumns();
 
+		$visibleSubcolumns = array();
+		foreach ($columns as $_column) {
+			if($_column->isVisible()) {
+				$visibleSubcolumns[] = $_column;
+			}
+
+		}
+
+		if($columns && count($visibleSubcolumns) > 0) {
+			foreach($visibleSubcolumns as $_column)
+				$html .= $treeColumnsPrintCanHide($_column);
+		} else {
+			if ($column->getCanHide()) {
+				$idColumn = md5(Json::encode($getColumnCompleteName($column)));
+				$html .= '<li data-columnid="'.$idColumn.'">';
+				
+				$html .= '<span class="can-hide-check todo-actions" style="' . ($isHide($column) ? 'opacity: 0.25;' : 'opacity: 1;') . ' ">
+													<a href="#'.md5(Json::encode($getColumnCompleteName($column))).'"><i class="' . ($isHide($column) ? 'icon-check' : 'icon-check-empty') . '"></i></a>
+												</span>
+												<span class="desc" style="' . ($isHide($column) ? 'opacity: 0.25; text-decoration: line-through;' : 'opacity: 1;') . ' ">'.$column->getLabel().'</span> ';
+				
+				$html .= '</li>';
+			} 
+			
+		}
+
+	}
+
+	return $html;
+};
+
+?>
+<div class="col-lg-12">
+					
+					<div class="row">	
+
+						<div class="col-lg-12 col-md-12 col-sm-12">
+							<div class="box">
+								<div class="box-header">
+									<h2><i class="icon-check"></i>Columnas</h2>
+									<div class="box-icon">
+										<a href="#" class="btn-minimize"><i class="icon-chevron-down"></i></a>
+										<a href="#" class="btn-close"><i class="icon-remove"></i></a>
+									</div>
+								</div>
+								<div class="box-content" style="display: none; ">
+									<div class="todo">
+										<ul class="todo-list ui-sortable">
+										 <?php foreach ($this->grid as $column) : ?>
+				                            <?php echo $treeColumnsPrintCanHide($column); ?>
+				                        <?php endforeach; ?>
+										</ul>
+									</div>	
+								</div>
+							</div>
+						</div><!--/col-->			
+					</div>
+					
+				</div>
+				
+					<div class="clearfix"></div>
+				
 <h2><?php echo $this->translate($this->grid->getCaption()) ?></h2>
 <?php if ($this->gridManager->isAllowCreate()): ?>
 <a class="btn btn-warning"

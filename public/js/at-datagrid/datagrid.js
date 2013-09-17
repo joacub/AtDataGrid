@@ -57,3 +57,28 @@ var DataGrid = new Object({
         });
     }
 });
+
+jQuery(function($) {
+	$('.can-hide-check').on('click', '.icon-check', function(e) {
+		var columnId = $(this).closest('[data-columnid]').data('columnid');
+		var th = $('th[data-columnid="'+columnId+'"]');
+		var position = th.closest('tr').find('th').index(th);
+		th.hide();
+		th.closest('table').find('tbody tr').each(function() {
+			$(this).find('td:eq('+position+')').hide();
+		});
+		$.cookie('columnshide-'+columnId, '');
+	});
+	
+	$('.can-hide-check').on('click', '.icon-check-empty', function() {
+		var columnId = $(this).closest('[data-columnid]').data('columnid');
+		var th = $('th[data-columnid="'+columnId+'"]');
+		var position = th.closest('tr').find('th').index(th);
+		th.show();
+		th.closest('table').find('tbody tr').each(function() {
+			$(this).find('td:eq('+position+')').show();
+		});
+		$.cookie('columnshide-'+columnId, 'show');
+	});
+	
+});
