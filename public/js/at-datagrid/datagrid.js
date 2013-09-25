@@ -59,6 +59,59 @@ var DataGrid = new Object({
 });
 
 jQuery(function($) {
+	
+	$('.todo-list').sortable({
+		start: function(event, ui) { 
+            jQuery.data( ui.item, 'previndex',  ui.item.index());
+        },
+		update: function( event, ui ) {
+			  var columnId = ui.item.data('columnid');
+			  var position = ui.item.closest('ul').find('li').index(ui.item);
+			  var th = $('th[data-columnid="'+columnId+'"]');
+			  var thposition = th.closest('tr').find('th').index(th);
+			  var method = jQuery.data( ui.item, 'previndex') > ui.item.index() ? 'before' : 'after';
+			  th.closest('table').find('tbody tr').each(function() {
+				  var e = $(this).find('td:eq('+thposition+')');
+				  if(method == 'after' ) {
+					  $(this).find('td:eq('+(position+1)+')').after(e);
+				  } else {
+					  $(this).find('td:eq('+(position+1)+')').before(e);
+				  }
+				});
+			  th.closest('table').find('thead tr').each(function() {
+				  var e = $(this).find('th:eq('+thposition+')');
+				  if(method == 'after' ) {
+					  $(this).find('th:eq('+(position+1)+')').after(e);
+				  } else {
+					  $(this).find('th:eq('+(position+1)+')').before(e);
+				  }
+				  
+				});
+			  
+			  
+			  var data = [];
+			  $( ".todo-list li" ).each(function() {
+				  var columnId = $(this).data('columnid');
+				  var position = $(this).closest('ul').find('li').index($(this));
+				  var state = ($(this).hasClass('icon-check') ? 0 : 1);
+				  data.push({'column':columnId, 'position':position, 'state':state});
+			  });
+			  $.ajax({
+		            type: 'POST',
+		            url: $(this).closest('ul').data('url'),
+		            cache: true,
+		            data: {columns:data, dataGridColumnState:true},
+		            dataType: 'html',
+		            success: function (result) {
+		                //$('#' + panel).html(result);
+		            },
+		            error: function(){
+		                //$('#' + panel).html('Oops! Error occured.');
+		            }
+		        });
+		  }
+	});
+	
 	$('.can-hide-check').on('click', '.icon-check', function(e) {
 		var columnId = $(this).closest('[data-columnid]').data('columnid');
 		var th = $('th[data-columnid="'+columnId+'"]');
@@ -67,7 +120,22 @@ jQuery(function($) {
 		th.closest('table').find('tbody tr').each(function() {
 			$(this).find('td:eq('+position+')').hide();
 		});
-		$.cookie('columnshide-'+columnId, '');
+//		$.cookie('columnshide-'+columnId, '');
+		var column = [];
+		column.push({'column':columnId, 'position':position, 'state':0});
+		$.ajax({
+            type: 'POST',
+            url: $(this).closest('ul').data('url'),
+            cache: true,
+            data: {columns:column, dataGridColumnState:true},
+            dataType: 'html',
+            success: function (result) {
+                //$('#' + panel).html(result);
+            },
+            error: function(){
+                //$('#' + panel).html('Oops! Error occured.');
+            }
+        });
 	});
 	
 	$('.can-hide-check').on('click', '.icon-check-empty', function() {
@@ -78,7 +146,22 @@ jQuery(function($) {
 		th.closest('table').find('tbody tr').each(function() {
 			$(this).find('td:eq('+position+')').show();
 		});
-		$.cookie('columnshide-'+columnId, 'show');
+//		$.cookie('columnshide-'+columnId, 'show');
+		var column = [];
+		column.push({'column':columnId, 'position':position, 'state':1});
+		$.ajax({
+            type: 'POST',
+            url: $(this).closest('ul').data('url'),
+            cache: true,
+            data: {columns:column, dataGridColumnState:true},
+            dataType: 'html',
+            success: function (result) {
+                //$('#' + panel).html(result);
+            },
+            error: function(){
+                //$('#' + panel).html('Oops! Error occured.');
+            }
+        });
 	});
 	
 });

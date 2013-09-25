@@ -63,6 +63,7 @@ class Manager
     public function __construct(DataGrid $grid, ServiceManager $sm)
     {
         $this->grid = $grid;
+        $this->grid->setServiceManager($sm);
         $this->sl = $sm;
     }
 

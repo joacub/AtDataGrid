@@ -571,4 +571,20 @@ class Column
     {
     	return $this->canHide;
     }
+    
+    protected $isHidden = false;
+    
+    public function setIsHidden($isHidden = true)
+    {
+        $this->isHidden = (bool) $isHidden;
+        return $this;
+    }
+    
+    public function isHidden()
+    {
+        if($this->getCanHide()) {
+            return $this->isHidden;
+        }
+        return false;
+    }
 }

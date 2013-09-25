@@ -5,21 +5,6 @@ use Nette\Diagnostics\Debugger;
 use Zend\Json\Json;
 $element = $column->getFormElement();
 
-$getColumnCompleteName = function($column, $indice = 0) use(&$getColumnCompleteName){
-	if($column->getParent()) {
-		$name = $getColumnCompleteName($column->getParent(), $indice++);
-	}
-
-	$name[] = $column->getName();
-
-	return $name;
-};
-
-$isHide = function($column) use($getColumnCompleteName) {
-	$idColumn = md5(Json::encode($getColumnCompleteName($column)));
-	return (empty($_COOKIE['columnshide-'.$idColumn]) && isset($_COOKIE['columnshide-'.$idColumn]));
-};
-
 if($element instanceof Select) {
 	$values = $element->getValueOptions();
 	if(is_string($value)) {
@@ -30,4 +15,4 @@ if($element instanceof Select) {
 	}
 }
 ?>
-<td <?php echo $isHide($column) ? 'style="display:none;"' : '' ?> class="<?php echo 'col-' . $column->getName() ?>"><?php echo $value ?></td>
+<td <?php echo $column->isHidden() ? 'style="display:none;"' : '' ?> class="<?php echo 'col-' . $column->getName() ?>"><?php echo $value ?></td>

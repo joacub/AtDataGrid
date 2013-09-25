@@ -192,7 +192,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
     {
         if (!$this->paginator) {
             $dp = new Paginator($this->getQueryBuilder());
-//             $dp->setUseOutputWalkers(false);
+            $dp->setUseOutputWalkers(false);
             $this->paginator = new \Zend\Paginator\Paginator(
                 new DoctrinePaginator($dp)
             );

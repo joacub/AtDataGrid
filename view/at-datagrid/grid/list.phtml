@@ -15,12 +15,7 @@ $getColumnCompleteName = function($column, $indice = 0) use(&$getColumnCompleteN
 	return $name;
 };
 
-$isHide = function($column) use($getColumnCompleteName) {
-	$idColumn = md5(Json::encode($getColumnCompleteName($column)));
-	return (empty($_COOKIE['columnshide-'.$idColumn]) && isset($_COOKIE['columnshide-'.$idColumn]));
-};
-
-$treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumnCompleteName, $isHide)
+$treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumnCompleteName)
 {
 	$html = '';
 	if ($column->isVisible()) {
@@ -38,7 +33,7 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumn
 			foreach($visibleSubcolumns as $_column)
 				$html .= $treeColumnsPrint($_column);
 		} else {
-			$html .= '<th '.($isHide($column) ? 'style="display:none;"' : '').' data-columnid="'.md5(Json::encode($getColumnCompleteName($column))).'">';
+			$html .= '<th '.($column->isHidden() ? 'style="display:none;"' : '').' data-columnid="'.md5(Json::encode($getColumnCompleteName($column))).'">';
 			if ($column->isSortable()) {
 				$html .= '<a class="sortable" href="' .
 				$this->joacubBaseQueryParams(
@@ -72,7 +67,7 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumn
 	return $html;
 };
 
-$treeColumnsPrintCanHide = function (Column $column) use(&$treeColumnsPrintCanHide, $getColumnCompleteName, $isHide)
+$treeColumnsPrintCanHide = function (Column $column) use(&$treeColumnsPrintCanHide, $getColumnCompleteName)
 {
 	$html = '';
 	if ($column->isVisible()) {
@@ -94,10 +89,10 @@ $treeColumnsPrintCanHide = function (Column $column) use(&$treeColumnsPrintCanHi
 				$idColumn = md5(Json::encode($getColumnCompleteName($column)));
 				$html .= '<li data-columnid="'.$idColumn.'">';
 				
-				$html .= '<span class="can-hide-check todo-actions" style="' . ($isHide($column) ? 'opacity: 0.25;' : 'opacity: 1;') . ' ">
-													<a href="#'.md5(Json::encode($getColumnCompleteName($column))).'"><i class="' . ($isHide($column) ? 'icon-check' : 'icon-check-empty') . '"></i></a>
+				$html .= '<span class="can-hide-check todo-actions" style="' . ($column->isHidden() ? 'opacity: 0.25;' : 'opacity: 1;') . ' ">
+													<a href="#'.$idColumn.'"><i class="' . ($column->isHidden() ? 'icon-check' : 'icon-check-empty') . '"></i></a>
 												</span>
-												<span class="desc" style="' . ($isHide($column) ? 'opacity: 0.25; text-decoration: line-through;' : 'opacity: 1;') . ' ">'.$column->getLabel().'</span> ';
+												<span class="desc" style="' . ($column->isHidden() ? 'opacity: 0.25; text-decoration: line-through;' : 'opacity: 1;') . ' ">'.$column->getLabel().'</span> ';
 				
 				$html .= '</li>';
 			} 

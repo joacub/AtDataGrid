@@ -1,5 +1,4 @@
 <?php
-
 namespace AtDataGrid\DataGrid;
 
 use AtDataGrid\DataGrid\DataSource;
@@ -7,51 +6,58 @@ use AtDataGrid\DataGrid\Column\Column;
 use Nette\Diagnostics\Debugger;
 use Zend\EventManager\EventManager;
 use Zend\Json\Json;
+use Doctrine\ORM\EntityManager;
+use Zend\ServiceManager\ServiceManager;
 
 /**
  * Class DataGrid
+ * 
  * @package AtDataGrid\DataGrid
  */
 class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
 {
+
     /**
      * Grid caption
      *
      * @var string
      */
     protected $caption = '';
-    
+
     /**
      * Grid caption
      *
      * @var string
      */
     protected $captionBackTo = 'Volver al listado';
-    
+
     /**
      * Data grid columns
      *
      * @var array
      */
     protected $columns = array();
-    
+
     /**
-     * 
+     *
      * @var array
      */
     protected $columnsOrderer = array();
 
     /**
+     *
      * @var string
      */
     protected $identifierColumnName = 'id';
 
     /**
+     *
      * @var null
      */
     protected $currentOrderColumn = null;
 
     /**
+     *
      * @var string
      */
     protected $currentOrderDirection = 'asc';
@@ -88,6 +94,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * Data source
      *
      * @var
+     *
      */
     protected $dataSource;
 
@@ -97,51 +104,60 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @var array
      */
     protected $dataPanels = array();
-    
+
     /**
-     * @param $dataSource
-     * @param array $options
+     *
+     * @var ServiceManager
+     */
+    protected $serviceManager;
+
+    /**
+     *
+     * @param
+     *            $dataSource
+     * @param array $options            
      */
     public function __construct($dataSource, $options = array())
     {
         $this->setDataSource($dataSource);
-
+        
         if ($options instanceof \Zend\Config\Config) {
             $options = $options->toArray();
         }
-
+        
         $this->setOptions($options);
-
-        /** @todo use event instead */
+        
+        /**
+         * @todo use event instead
+         */
         $this->init();
     }
-    
+
     /**
      * Initialize data grid (used by extending classes)
      *
-     * 
+     *
      * @return void
      */
     public function init()
-    {
-    }
+    {}
     
     // OPTIONS
-
+    
     /**
      * Set data grid options
      *
-     * @param array $options
+     * @param array $options            
      * @return DataGrid
      */
     public function setOptions(array $options)
     {
         unset($options['options']);
         unset($options['config']);
-
+        
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
-
+            
             if (method_exists($this, $method)) {
                 $this->$method($value);
             }
@@ -151,9 +167,11 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
     
     // METADATA
-
+    
     /**
-     * @param $caption
+     *
+     * @param
+     *            $caption
      * @return DataGrid
      */
     public function setCaption($caption)
@@ -163,46 +181,53 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return string
      */
     public function getCaption()
     {
         return $this->caption;
     }
-    
+
     /**
-     * @param $caption
+     *
+     * @param
+     *            $caption
      * @return DataGrid
      */
     public function setCaptionBackTo($caption)
     {
-    	$this->captionBackTo = $caption;
-    	return $this;
+        $this->captionBackTo = $caption;
+        return $this;
     }
-    
+
     /**
+     *
      * @return string
      */
     public function getCaptionBackTo()
     {
-    	return $this->captionBackTo;
+        return $this->captionBackTo;
     }
-
+    
     // COLUMNS
-
+    
     /**
-     * @param $name
+     *
+     * @param
+     *            $name
      * @return DataGrid
      */
     public function setIdentifierColumnName($name)
     {
         $this->identifierColumnName = (string) $name;
         $this->getDataSource()->setIdentifierFieldName($this->identifierColumnName);
-
+        
         return $this;
     }
 
     /**
+     *
      * @return string
      */
     public function getIdentifierColumnName()
@@ -213,7 +238,8 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * Check if is column present in column list
      *
-     * @param $name
+     * @param
+     *            $name
      * @return bool
      */
     protected function isColumn($name)
@@ -224,32 +250,32 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * Add a column to data grid
      *
-     * @param Column $column
-     * @param bool $overwrite
+     * @param Column $column            
+     * @param bool $overwrite            
      * @return DataGrid
      * @throws \Exception
      */
     public function addColumn(Column $column, $overwrite = false, $forceCreate = false)
     {
-        if ( (false == $overwrite) && (false === $forceCreate && $this->isColumn($column)) ) {
+        if ((false == $overwrite) && (false === $forceCreate && $this->isColumn($column))) {
             throw new \Exception('Column `' . $column->getName() . '` already in a column list. Use other name.');
-        }    
+        }
         
         $this->columns[$column->getName()] = $column;
-    	
-    	// If label is not set, set column name as label
-    	if (null == $column->getLabel()) {
-    		$column->setLabel($column->getName());
-    	}
-    	
-    	return $this;
+        
+        // If label is not set, set column name as label
+        if (null == $column->getLabel()) {
+            $column->setLabel($column->getName());
+        }
+        
+        return $this;
     }
 
     /**
      * Set column by given name with overwriting.
      * Alias for addColumn($column, true)
      *
-     * @param Column $column
+     * @param Column $column            
      * @return DataGrid
      */
     public function setColumn(Column $column)
@@ -261,23 +287,24 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * Add columns to grid
      *
-     * @param array $columns
-     * @param bool $overwrite
+     * @param array $columns            
+     * @param bool $overwrite            
      * @return DataGrid
      */
     public function addColumns(array $columns, $overwrite = false)
     {
         foreach ($columns as $column) {
-        	$this->addColumn($column, $overwrite);        
+            $this->addColumn($column, $overwrite);
         }
-
+        
         return $this;
     }
 
     /**
      * Return column object specified by it name
      *
-     * @param $name
+     * @param
+     *            $name
      * @throws \Exception
      * @return Column
      */
@@ -288,7 +315,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         }
         
         $columnName = array();
-        foreach($this->columns as $columnName => $column)
+        foreach ($this->columns as $columnName => $column)
             $columns[] = $columnName;
         
         throw new \Exception("Column '" . $name . "' doesn't exist in column list => " . implode(', ', $columns));
@@ -307,7 +334,8 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * Remove column specified by it name
      *
-     * @param $name
+     * @param
+     *            $name
      * @return DataGrid
      */
     public function removeColumn($name)
@@ -315,43 +343,43 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         if ($this->isColumn($name)) {
             unset($this->columns[$name]);
         }
-
-    	return $this;	
+        
+        return $this;
     }
 
     /**
      * Remove columns specified by its names
      *
-     * @param array $names
+     * @param array $names            
      * @return DataGrid
      */
     public function removeColumns(array $names)
     {
         foreach ($names as $name) {
-	        $this->removeColumn($name);
+            $this->removeColumn($name);
         }
         
-        return $this;     	
+        return $this;
     }
 
     /**
      * Set column invisible in grid
      *
-     * @param $name
+     * @param
+     *            $name
      * @return DataGrid
      */
     public function hideColumn($name)
     {
-        $this->getColumn($name)
-             ->setVisible(false);
+        $this->getColumn($name)->setVisible(false);
         
-        return $this;   
+        return $this;
     }
 
     /**
      * Set columns invisible in grid
      *
-     * @param array $names
+     * @param array $names            
      * @return DataGrid
      */
     public function hideColumns(array $names)
@@ -359,28 +387,29 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         foreach ($names as $name) {
             $this->hideColumn($name);
         }
-
-        return $this;                   
+        
+        return $this;
     }
 
     /**
      * Set column invisible in add/edit form
      *
-     * @param $name
+     * @param
+     *            $name
      * @return DataGrid
      */
     public function hideColumnInForm($name)
     {
-        $this->getColumn($name)
-    	     ->setVisibleInForm(false);
+        $this->getColumn($name)->setVisibleInForm(false);
         
-        return $this;    
+        return $this;
     }
 
     /**
      * Set columns invisible in form
      *
-     * @param $names
+     * @param
+     *            $names
      * @return DataGrid
      */
     public function hideColumnsInForm($names)
@@ -388,44 +417,48 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         foreach ($names as $name) {
             $this->hideColumnInForm($name);
         }
-
+        
         return $this;
     }
-
-
+    
     // SORTING
-
+    
     /**
-     * @param string $order  columnName~orderDirection
+     *
+     * @param string $order
+     *            columnName~orderDirection
      */
     public function setOrder($order)
     {
         $order = explode('~', $order);
-
+        
         if (isset($order[1])) {
-            list($columnName, $orderDirection) = $order;
+            list ($columnName, $orderDirection) = $order;
             $this->setCurrentOrderColumn($columnName, $orderDirection);
         }
     }
 
     /**
-     * @param $columnName
-     * @param $orderDirection
+     *
+     * @param
+     *            $columnName
+     * @param
+     *            $orderDirection
      */
     public function setCurrentOrderColumn($columnName, $orderDirection = 'asc')
     {
         try {
-        	$columnParse = Json::decode($columnName);
-        	
-        	$column = $this->getColumn(array_shift($columnParse));
-        	
-        	foreach ($columnParse as $columnName) {
-        		$column = $column->getColumn($columnName);
-        	}
-        	
+            $columnParse = Json::decode($columnName);
+            
+            $column = $this->getColumn(array_shift($columnParse));
+            
+            foreach ($columnParse as $columnName) {
+                $column = $column->getColumn($columnName);
+            }
+            
             $this->currentOrderColumn = $column;
-            $this->currentOrderDirection  = $orderDirection;
-
+            $this->currentOrderDirection = $orderDirection;
+            
             $column->setOrderDirection($orderDirection);
             $column->revertOrderDirection();
         } catch (\Exception $e) {
@@ -434,6 +467,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return null
      */
     public function getCurrentOrderColumn()
@@ -442,19 +476,20 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return string
      */
     public function getCurrentOrderDirection()
     {
         return $this->currentOrderDirection;
     }
-
+    
     // DATA SOURCE
-
+    
     /**
      * Set data source and load columns defined in it
      *
-     * @param DataSource\AbstractDataSource $dataSource
+     * @param DataSource\AbstractDataSource $dataSource            
      * @return DataGrid
      */
     public function setDataSource(DataSource\AbstractDataSource $dataSource)
@@ -462,7 +497,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         $this->dataSource = $dataSource;
         $this->columns = $this->getDataSource()->getColumns();
         
-    	return $this;	
+        return $this;
     }
 
     /**
@@ -474,11 +509,12 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     {
         return $this->dataSource;
     }
-    
+
     /**
      * Find row by primary key
      *
-     * @param $key
+     * @param
+     *            $key
      * @return mixed
      */
     public function getRow($key)
@@ -487,33 +523,28 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * Returns rows demands on list type. It may be list or tree
+     * Returns rows demands on list type.
+     * It may be list or tree
      *
-     * @param string $listType
+     * @param string $listType            
      * @return mixed
      */
     public function getData($listType = DataSource\AbstractDataSource::LIST_TYPE_PLAIN)
     {
         $order = null;
-
+        
         if ($this->getCurrentOrderColumn()) {
             $order['column'] = $this->getCurrentOrderColumn();
             $order['direction'] = $this->getCurrentOrderDirection();
         }
-
-    	$this->data = $this->getDataSource()->fetch(
-            $listType,
-            $order,
-            $this->currentPage,
-            $this->itemsPerPage,
-            $this->pageRange
-        );
-
+        
+        $this->data = $this->getDataSource()->fetch($listType, $order, $this->currentPage, $this->itemsPerPage, $this->pageRange);
+        
         return $this->data;
     }
-
+    
     // CRUD
-
+    
     /**
      * Insert new row to grid
      */
@@ -525,8 +556,10 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * Update row in a grid
      *
-     * @param $data
-     * @param $primary
+     * @param
+     *            $data
+     * @param
+     *            $primary
      */
     public function update($data, $primary)
     {
@@ -534,8 +567,10 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * @param $data
-     * @param null $identifier
+     *
+     * @param
+     *            $data
+     * @param null $identifier            
      */
     public function save(EventManager $eventManager, $data, $identifier = null)
     {
@@ -547,144 +582,150 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         
         $params = compact('data', 'id');
         $eventManager->trigger(__FUNCTION__, $this, $params);
-
+        
         return $id;
     }
 
     /**
-     * @param $identifier
+     *
+     * @param
+     *            $identifier
      */
     public function delete($identifier)
     {
         $this->getDataSource()->delete($identifier);
     }
-
-
+    
     // FILTERS
-
+    
     /**
      * Add filter to column
      *
-     * @param $column
-     * @param $filter
+     * @param
+     *            $column
+     * @param
+     *            $filter
      * @return DataGrid
      */
     public function addFilter($column, $filter)
     {
         $this->getColumn($column)->addFilter($filter);
-        return $this;    
+        return $this;
     }
 
     /**
-     * Apply filters. Modify select object.
+     * Apply filters.
+     * Modify select object.
      *
-     * @param $values
+     * @param
+     *            $values
      */
     public function applyFilters($values, Column $column = null)
     {
-    	if($column === null) {
-        	$columns = $this->getColumns();
-    	} else {
-    		$columns = $column->getColumns();
-    		
-    		$values = @$values[$column->getName()];
-    	}
-
-        /** @var \Zend\Db\Sql\Select $select  */
+        if ($column === null) {
+            $columns = $this->getColumns();
+        } else {
+            $columns = $column->getColumns();
+            
+            $values = @$values[$column->getName()];
+        }
+        
+        /**
+         * @var \Zend\Db\Sql\Select $select
+         */
         $select = $this->getDataSource()->getSelect();
-
+        
         foreach ($columns as $_column) {
-             $filters = $_column->getFilters();
-             $subColumns = $_column->getColumns();
-             if(count($subColumns) > 0)
-             	$this->applyFilters($values, $_column);
+            $filters = $_column->getFilters();
+            $subColumns = $_column->getColumns();
+            if (count($subColumns) > 0)
+                $this->applyFilters($values, $_column);
             
             foreach ($filters as $filter) {
                 $filter->apply($select, $_column, @$values[$filter->getName()]);
             }
         }
-
-        //var_dump($select->getSqlString());exit;
-
-        //exit;
+        
+        // var_dump($select->getSqlString());exit;
+        
+        // exit;
     }
 
     /**
-     * @param array $options
+     *
+     * @param array $options            
      * @return \Zend\Form\Form
      */
     public function getFiltersForm($options = array(), Column $column = null)
     {
-    	
-    	$name = 'filters-form';
-    	if($column !== null)
-    		$name = $column->getName();
-    	
+        $name = 'filters-form';
+        if ($column !== null)
+            $name = $column->getName();
+        
         $form = new \Zend\Form\Form($name, $options);
         
         $insertApplyElement = false;
-        if($column === null) {
-        	$columns = true;
-        	$columns = $this->getColumns();
-        }  else {
-        	$columns = $column->getColumns();
+        if ($column === null) {
+            $columns = true;
+            $columns = $this->getColumns();
+        } else {
+            $columns = $column->getColumns();
         }
         
         foreach ($columns as $column) {
-        	
-        	if(!$column->isVisible())
-        		continue;
-        	
-        	$subColumns = $column->getColumns();
-        	
-        	
-        	if(count($subColumns) > 0) {
-        		$form->add($this->getFiltersForm($options, $column));
-        		
-        		if ($column->hasFilters()) {
-        			$filters = $column->getFilters();
-        			foreach ($filters as $filter) {
-        				$form->add($column->getFilterFormElement($filter));
-        			}
-        		}
-        		
-        	} else {
-        		 
-        		if ($column->hasFilters()) {
-        			$filters = $column->getFilters();
-        			foreach ($filters as $filter) {
-        				$form->add($column->getFilterFormElement($filter));
-        			}
-        		}
-        	}
-        	
-        	
+            
+            if (! $column->isVisible())
+                continue;
+            
+            $subColumns = $column->getColumns();
+            
+            if (count($subColumns) > 0) {
+                $form->add($this->getFiltersForm($options, $column));
+                
+                if ($column->hasFilters()) {
+                    $filters = $column->getFilters();
+                    foreach ($filters as $filter) {
+                        $form->add($column->getFilterFormElement($filter));
+                    }
+                }
+            } else {
+                
+                if ($column->hasFilters()) {
+                    $filters = $column->getFilters();
+                    foreach ($filters as $filter) {
+                        $form->add($column->getFilterFormElement($filter));
+                    }
+                }
+            }
         }
-
-        if($insertApplyElement) {
-	        // Apply button
-	        $apply = new \Zend\Form\Element\Submit('apply');
-	        $apply->setLabel('Поиск');
-	        $form->add($apply);
+        
+        if ($insertApplyElement) {
+            // Apply button
+            $apply = new \Zend\Form\Element\Submit('apply');
+            $apply->setLabel('Поиск');
+            $form->add($apply);
         }
         
         return $form;
     }
 
     /**
-     * @param $number
+     *
+     * @param
+     *            $number
      * @return DataGrid
      */
     public function setCurrentPage($number)
     {
-        if (!is_null($number)) {
+        if (! is_null($number)) {
             $this->currentPage = (int) $number;
         }
-
+        
         return $this;
     }
 
     /**
+     *
      * @return int
      */
     public function getCurrentPage()
@@ -692,20 +733,21 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         return $this->currentPage;
     }
 
-
     /**
-     * @param integer $count
+     *
+     * @param integer $count            
      */
     public function setItemsPerPage($count)
     {
-        if (!is_null($count)) {
+        if (! is_null($count)) {
             $this->itemsPerPage = (int) $count;
         }
-
+        
         return $this;
     }
 
     /**
+     *
      * @return int
      */
     public function getItemsPerPage()
@@ -714,43 +756,53 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * @param $count
+     *
+     * @param
+     *            $count
      * @return DataGrid
      */
     public function setPageRange($count)
     {
-        if (!is_null($count)) {
+        if (! is_null($count)) {
             $this->pageRange = (int) $count;
         }
-
+        
         return $this;
     }
-
+    
     // DATA PANELS
-
+    
     /**
-     * @param $key
-     * @param $name
-     * @param bool $isAjax
+     *
+     * @param
+     *            $key
+     * @param
+     *            $name
+     * @param bool $isAjax            
      * @return DataGrid
      */
     public function addDataPanel($key, $name, $isAjax = true)
     {
-        $this->dataPanels[$key] = array('name' => $name, 'is_ajax' => $isAjax);
+        $this->dataPanels[$key] = array(
+            'name' => $name,
+            'is_ajax' => $isAjax
+        );
         return $this;
     }
 
     /**
+     *
      * @return array
      */
     public function getDataPanels()
     {
         return $this->dataPanels;
     }
-
+    
     // Interfaces implementation
-
+    
     /**
+     *
      * @return mixed
      */
     public function current()
@@ -759,6 +811,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return bool
      */
     public function valid()
@@ -767,6 +820,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return mixed
      */
     public function next()
@@ -775,6 +829,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return mixed
      */
     public function key()
@@ -783,6 +838,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return mixed
      */
     public function rewind()
@@ -791,6 +847,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     *
      * @return int
      */
     public function count()
@@ -799,7 +856,8 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * @param mixed $offset
+     *
+     * @param mixed $offset            
      * @return bool
      */
     public function offsetExists($offset)
@@ -808,21 +866,23 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * @param mixed $offset
-     * @return bool|mixed
+     *
+     * @param mixed $offset            
+     * @return bool mixed
      */
     public function offsetGet($offset)
     {
-        if(isset($this->columns[$offset])) {
+        if (isset($this->columns[$offset])) {
             return $this->columns[$offset];
         }
-
+        
         return false;
     }
 
     /**
-     * @param mixed $offset
-     * @param mixed $column
+     *
+     * @param mixed $offset            
+     * @param mixed $column            
      */
     public function offsetSet($offset, $column)
     {
@@ -834,7 +894,8 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * @param mixed $offset
+     *
+     * @param mixed $offset            
      */
     public function offsetUnset($offset)
     {
@@ -846,74 +907,131 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
     /**
      * Get an iterator for iterating over the elements in the collection.
      *
-     * @return \ArrayIterator|\Traversable
+     * @return \ArrayIterator \Traversable
      */
     public function getIterator()
     {
-    	$tmpOrderer = $this->columnsOrderer;
-    	foreach($this->columns as $k => $v) {
-    		if($v->isVisible())
-    		$tmpColumns[$k] = $v;
-    	}
-    	
-    	foreach($tmpOrderer as $column) {
-    		unset($tmpColumns[$column->getName()]);
-    	}
-    	
-    	$newColumns = array();
-    	
-    	$i = 0;
-    	while(1) {
-    		if(empty($tmpOrderer))
-    			break;
-    		current($tmpOrderer);
-    		$k = key($tmpOrderer);
-    		if($k != $i) {
-    			$i++;
-    			if(empty($tmpColumns))
-    				continue;
-    			$column = array_shift($tmpColumns);
-    			$newColumns[$column->getName()] = $column;
-    			unset($tmpColumns[$column->getName()]);
-    			continue;
-    		}
-    		
-    		$column = $tmpOrderer[$k];
-    		$newColumns[$column->getName()] = $column;
-    		if(isset($tmpColumns[$column->getName()]))
-    			unset($tmpColumns[$column->getName()]);
-    		
-    		unset($tmpOrderer[$k]);
-    		$i++;
-    		
-    	}
-    	
-    	foreach($tmpColumns as $column) {
-    		$newColumns[$column->getName()] = $column;
-    	}
-    	
-    	
+        $em = $this->getDataSource()->getEm();
+        
+        $em instanceof EntityManager;
+        $repo = $em->getRepository('AtAdmin\Entity\ColumnState');
+        $auth = $this->getServiceManager()->get('zfcuser_auth_service');
+        $user = $auth->getIdentity();
+        
+        foreach ($this->columns as $k => $v) {
+            if ($v->isVisible()) {
+                $tmpColumns[$k] = $v;
+                $entity = $repo->findOneBy(array(
+                    'column' => $this->getColumnId($v),
+                    'user' => $user
+                ));
+                
+                if ($entity) {
+                    $v instanceof Column;
+                    $v->setIsHidden(($entity->getStatus() === false));
+                    $this->setOrderColumn($entity->getPosition(), $v);
+                }
+            }
+        }
+        
+        $tmpOrderer = $this->columnsOrderer;
+        
+        foreach ($tmpOrderer as $column) {
+            $entity = $repo->findOneBy(array(
+                'column' => $this->getColumnId($v),
+                'user' => $user
+            ));
+            
+            if ($entity) {
+                $column->setIsHidden(($entity->getStatus() === false));
+                $this->setOrderColumn($entity->getPosition(), $column);
+            }
+        }
+        
+        $tmpOrderer = $this->columnsOrderer;
+        
+        foreach ($tmpOrderer as $column) {
+            unset($tmpColumns[$column->getName()]);
+        }
+        
+        $newColumns = array();
+        
+        $i = 0;
+        while (1) {
+            if (empty($tmpOrderer))
+                break;
+            current($tmpOrderer);
+            $k = key($tmpOrderer);
+            if ($k != $i) {
+                $i ++;
+                if (empty($tmpColumns))
+                    continue;
+                $column = array_shift($tmpColumns);
+                $newColumns[$column->getName()] = $column;
+                unset($tmpColumns[$column->getName()]);
+                continue;
+            }
+            
+            $column = $tmpOrderer[$k];
+            $newColumns[$column->getName()] = $column;
+            if (isset($tmpColumns[$column->getName()]))
+                unset($tmpColumns[$column->getName()]);
+            
+            unset($tmpOrderer[$k]);
+            $i ++;
+        }
+        
+        foreach ($tmpColumns as $column) {
+            $newColumns[$column->getName()] = $column;
+        }
+        
         return new \ArrayIterator($newColumns);
     }
-    
+
     public function setTitleColumnName($name)
     {
-    	$this->titleColumnName = $name;
-    	return $this;
+        $this->titleColumnName = $name;
+        return $this;
     }
-    
+
     /**
      *
      * @return string
      */
     public function getTitleColumnName()
     {
-    	return $this->titleColumnName;
+        return $this->titleColumnName;
     }
-    
+
     public function setOrderColumn($orderColumn, $column)
     {
-    	$this->columnsOrderer[$orderColumn] = $column;
-    	ksort($this->columnsOrderer);
+        $this->columnsOrderer[$orderColumn] = $column;
+        ksort($this->columnsOrderer);
+    }
+
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+    }
+
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
+
+    public function getColumnCompleteName($column)
+    {
+        if ($column->getParent()) {
+            $name = $this->getColumnId($column->getParent());
+        }
+        
+        $name[] = $column->getName();
+        
+        return $name;
+    }
+
+    public function getColumnId($column)
+    {
+        return md5(Json::encode($this->getColumnCompleteName($column)));
     }
 }
