@@ -54,7 +54,7 @@ $filtersClean, $isHide)
 						$fieldset[$column->getName()]);
 			}
 		} else {
-			$html .= '<td '.($isHide($column) ? 'style="display:none;"' : '').' >';
+			$html .= '<td '.($column->isHidden() ? 'style="display:none;"' : '').' >';
 			if ($column->hasFilters()) {
 				foreach ($column->getFilters() as $filter) {
 					$filtersClean[$filter->getName()] = null;

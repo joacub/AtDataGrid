@@ -19,7 +19,7 @@
 /* Site */
 .main-menu li {font-size: 10px; text-transform: uppercase;}
 
-.container .todo ul li { 
+.container .todo.at-datagrid ul li { 
 	display: inline-block;
 }
 

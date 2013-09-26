@@ -656,13 +656,19 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      * @param array $options            
      * @return \Zend\Form\Form
      */
-    public function getFiltersForm($options = array(), Column $column = null)
+    public function getFiltersForm($options = array(), Column $column = null, $fieldset = false )
     {
         $name = 'filters-form';
         if ($column !== null)
             $name = $column->getName();
         
-        $form = new \Zend\Form\Form($name, $options);
+        if($fieldset) {
+            $form = new \Zend\Form\Fieldset($name, $options);
+        } else {
+            $form = new \Zend\Form\Form($name, $options);
+        }
+        
+        $form->setUseAsBaseFieldset(true);
         
         $insertApplyElement = false;
         if ($column === null) {
@@ -680,7 +686,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
             $subColumns = $column->getColumns();
             
             if (count($subColumns) > 0) {
-                $form->add($this->getFiltersForm($options, $column));
+                $form->add($this->getFiltersForm($options, $column, $form));
                 
                 if ($column->hasFilters()) {
                     $filters = $column->getFilters();
