@@ -6,9 +6,7 @@ use Zend\Json\Json;
 
 $form = $this->grid->getFiltersForm();
 $form->prepare();
-$form->setAttribute('action', $this->url(null, array(
-	'action' => 'list'
-)));
+$form->setAttribute('action', $this->url(null, array(), true));
 $form->setAttribute('method', 'get');
 $form->setAttribute('id', 'datagrid-filters-form');
 

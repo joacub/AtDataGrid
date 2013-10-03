@@ -587,4 +587,16 @@ class Column
         }
         return false;
     }
+    
+    protected $orderCondition;
+    public function getHandlerOrderCondition()
+    {
+        return $this->orderCondition;
+    }
+    
+    public function setHandlerOrderCondition($orderCondition)
+    {
+        $this->orderCondition = $orderCondition;
+        return $this;
+    }
 }

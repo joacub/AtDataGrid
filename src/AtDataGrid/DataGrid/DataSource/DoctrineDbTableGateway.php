@@ -383,30 +383,35 @@ class DoctrineDbTableGateway extends AbstractDataSource
 				
 				$columnOrder = $order['column'];
 				
-				if ($columnOrder instanceof DbReference) {
-					$columnOrderEntity = $columnOrder->getdataSource()->getEntity();
-					$this->getSelect()
-						->leftJoin($this->getEntity() . '.' . $columnOrder->getName(), 
-							$columnOrderEntity)
-						->addSelect('COUNT(' . $columnOrderEntity . '.id) AS '.$columnOrderEntity.'_cnt')
-						->groupBy($this->getEntity() . '.id')
-						->orderBy($columnOrderEntity . '_' . 'cnt', $order['direction']);
+				$handlerOrderCondition = $columnOrder->getHandlerOrderCondition();
+				
+				if($handlerOrderCondition) {
+				    $handlerOrderCondition($this->getSelect(), $order['direction']);
 				} else {
-					
-					
-					if($order['column']->getParent()) {
-						$columnOrderEntity = $order['column']->getdataSource()->getEntity();
-						$this->getSelect()
-						->leftJoin($this->getEntity() . '.' . $order['column']->getParent()->getName(),
-								$columnOrderEntity)
-								->groupBy($this->getEntity() . '.id')
-								->orderBy($columnOrderEntity . '.' . $order['column']->getName(), $order['direction']);
-					} else {
-						$this->getSelect()->orderBy(
-								$this->getEntity() . '.' . $columnOrder->getName(), $order['direction']);
-					}
-					
+				    if ($columnOrder instanceof DbReference) {
+				        $columnOrderEntity = $columnOrder->getdataSource()->getEntity();
+				        $this->getSelect()
+				        ->leftJoin($this->getEntity() . '.' . $columnOrder->getName(),
+				            $columnOrderEntity)
+				            ->addSelect('COUNT(' . $columnOrderEntity . '.id) AS '.$columnOrderEntity.'_cnt')
+				            ->groupBy($this->getEntity() . '.id')
+				            ->orderBy($columnOrderEntity . '_' . 'cnt', $order['direction']);
+				    } else {
+				        if($order['column']->getParent()) {
+				            $columnOrderEntity = $order['column']->getdataSource()->getEntity();
+				            $this->getSelect()
+				            ->leftJoin($this->getEntity() . '.' . $order['column']->getParent()->getName(),
+				                $columnOrderEntity)
+				                ->groupBy($this->getEntity() . '.id')
+				                ->orderBy($columnOrderEntity . '.' . $order['column']->getName(), $order['direction']);
+				        } else {
+				            $this->getSelect()->orderBy(
+				                $this->getEntity() . '.' . $columnOrder->getName(), $order['direction']);
+				        }
+				        	
+				    }
 				}
+				
 			}
 			
 			$this->getQueryBuilder()->addSelect($this->getEntity());

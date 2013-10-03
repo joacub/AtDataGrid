@@ -120,7 +120,7 @@ class Html extends AbstractRenderer
         
         $viewModel->setTemplate($originalTemplateBase . '/grid/list');
         if(false === $viewResolver->resolve($viewModel->getTemplate()))
-            $viewModel->setTemplate('at-datagrid/grid/list');
+            $viewModel->setTemplate($this->getTemplate());
         
         //filters
         $viewGridflashMessenger = new ViewModel($variables);

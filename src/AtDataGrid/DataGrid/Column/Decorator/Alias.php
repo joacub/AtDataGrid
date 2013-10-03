@@ -39,7 +39,7 @@ class Alias extends AbstractDecorator
             return parent::render($this->renameTo[$value]);
         }
         
-        return $value;
+        return parent::render($value);
         
     }
 
