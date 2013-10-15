@@ -126,7 +126,6 @@ jQuery(function($) {
 		$.ajax({
             type: 'POST',
             url: $(this).closest('ul').data('url'),
-            cache: true,
             data: {columns:column, dataGridColumnState:true},
             dataType: 'html',
             success: function (result) {
@@ -152,7 +151,6 @@ jQuery(function($) {
 		$.ajax({
             type: 'POST',
             url: $(this).closest('ul').data('url'),
-            cache: true,
             data: {columns:column, dataGridColumnState:true},
             dataType: 'html',
             success: function (result) {

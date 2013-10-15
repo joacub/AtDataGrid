@@ -257,11 +257,11 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
      */
     public function addColumn(Column $column, $overwrite = false, $forceCreate = false)
     {
-        if ((false == $overwrite) && (false === $forceCreate && $this->isColumn($column))) {
+        if ((false == $overwrite) && (false === $forceCreate && $this->isColumn($this->getColumnId($column)))) {
             throw new \Exception('Column `' . $column->getName() . '` already in a column list. Use other name.');
         }
         
-        $this->columns[$column->getName()] = $column;
+        $this->columns[$this->getColumnId($column)] = $column;
         
         // If label is not set, set column name as label
         if (null == $column->getLabel()) {
@@ -680,8 +680,8 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         
         foreach ($columns as $column) {
             
-            if (! $column->isVisible())
-                continue;
+//             if (! $column->isVisible())
+//                 continue;
             
             $subColumns = $column->getColumns();
             
@@ -926,7 +926,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         
         foreach ($this->columns as $k => $v) {
             if ($v->isVisible()) {
-                $tmpColumns[$k] = $v;
+                $tmpColumns[$this->getColumnId($v)] = $v;
                 $entity = $repo->findOneBy(array(
                     'column' => $this->getColumnId($v),
                     'user' => $user
@@ -944,7 +944,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         
         foreach ($tmpOrderer as $column) {
             $entity = $repo->findOneBy(array(
-                'column' => $this->getColumnId($v),
+                'column' => $this->getColumnId($column),
                 'user' => $user
             ));
             
@@ -957,7 +957,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         $tmpOrderer = $this->columnsOrderer;
         
         foreach ($tmpOrderer as $column) {
-            unset($tmpColumns[$column->getName()]);
+            unset($tmpColumns[$this->getColumnId($column)]);
         }
         
         $newColumns = array();
@@ -973,24 +973,24 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
                 if (empty($tmpColumns))
                     continue;
                 $column = array_shift($tmpColumns);
-                $newColumns[$column->getName()] = $column;
-                unset($tmpColumns[$column->getName()]);
+                $newColumns[$this->getColumnId($column)] = $column;
+                unset($tmpColumns[$this->getColumnId($column)]);
                 continue;
             }
             
             $column = $tmpOrderer[$k];
-            $newColumns[$column->getName()] = $column;
-            if (isset($tmpColumns[$column->getName()]))
-                unset($tmpColumns[$column->getName()]);
+            $newColumns[$this->getColumnId($column)] = $column;
+            if (isset($tmpColumns[$this->getColumnId($column)]))
+                unset($tmpColumns[$this->getColumnId($column)]);
             
             unset($tmpOrderer[$k]);
             $i ++;
         }
         
         foreach ($tmpColumns as $column) {
-            $newColumns[$column->getName()] = $column;
+            $newColumns[$this->getColumnId($column)] = $column;
         }
-        
+       
         return new \ArrayIterator($newColumns);
     }
 
@@ -1025,14 +1025,12 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         return $this->serviceManager;
     }
 
-    public function getColumnCompleteName($column)
+    public function getColumnCompleteName($column, $name = array())
     {
         if ($column->getParent()) {
-            $name = $this->getColumnId($column->getParent());
+            $name = $this->getColumnCompleteName($column->getParent(), $name);
         }
-        
         $name[] = $column->getName();
-        
         return $name;
     }
 

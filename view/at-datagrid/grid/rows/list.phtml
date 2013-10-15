@@ -2,7 +2,19 @@
 
 use Nette\Diagnostics\Debugger;
 $hydrator = new DoctrineModule\Stdlib\Hydrator\DoctrineObject($this->gridManager->getGrid()->getDatasource()->getEm(), $this->gridManager->getGrid()->getDatasource()->getEntity());
+$getValue = function($collumn, $row) use(&$getValue) {
+    $value = $row;
+    if($collumn->getParent()) {
+        $value = $getValue($collumn->getParent(), $row);
+    }
 
+    if(method_exists($value, "get" . ucfirst($collumn->getName()))) {
+        return $value->{"get" . ucfirst($collumn->getName())}();
+    } else {
+        return '';
+    }
+
+};
 $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
 ?>
 <form method="post" action="" id="datagrid-list-form">
@@ -22,10 +34,7 @@ $actionsIcons = array('delete' => '<i class="icon-trash"></i>');
                 <?php if (isset($collumn) && $collumn->isVisible()): ?>
                 
                 <?php 
-                $value = '';
-                if(method_exists($row, "get" . ucfirst($collumn->getName())))
-                    $value = $row->{"get" . ucfirst($collumn->getName())}();
-                
+                $value = $getValue($collumn, $row);
 				$arrayOrViewModel = $collumn->render($value, $row);
 				
 				if(is_array($arrayOrViewModel)) {

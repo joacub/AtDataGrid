@@ -19,72 +19,44 @@ $treeColumnsPrint = function (Column $column) use(&$treeColumnsPrint, $getColumn
 {
 	$html = '';
 	if ($column->isVisible()) {
-		$columns = (array) $column->getColumns();
-		
-		$visibleSubcolumns = array();
-		foreach ($columns as $_column) {
-			if($_column->isVisible()) {
-				$visibleSubcolumns[] = $_column;
-			}
-				
-		}
-		
-		if($columns && count($visibleSubcolumns) > 0) {
-			foreach($visibleSubcolumns as $_column)
-				$html .= $treeColumnsPrint($_column);
-		} else {
-			$html .= '<th '.($column->isHidden() ? 'style="display:none;"' : '').' data-columnid="'.md5(Json::encode($getColumnCompleteName($column))).'">';
-			if ($column->isSortable()) {
-				$html .= '<a class="sortable" href="' .
-				$this->joacubBaseQueryParams(
-						array(
-							'page' => 1,
-							'order' => Json::encode($getColumnCompleteName($column)) . '~' .
-							$column->getOrderDirection()
-						)) . '">';
-				if ($this->grid->getCurrentOrderColumn() == $column) {
-					$html .= '<span class="active">';
-					$html .=  $column->getLabel();
-					if ($this->grid->getCurrentOrderDirection() == 'asc') {
-						$html .= ' <i class="glyphicon glyphicon-sort-by-alphabet"></i>';
-					} elseif ($this->grid->getCurrentOrderDirection() == 'desc') {
-						$html .= ' <i class="glyphicon glyphicon-sort-by-alphabet-alt"></i>';
-					}
-					$html .= '</span>';
-				} else {
-					$html .= $column->getLabel();
-					$html .= ' <i class="glyphicon glyphicon-sort"></i>';
+		$html .= '<th '.($column->isHidden() ? 'style="display:none;"' : '').' data-columnid="'.md5(Json::encode($getColumnCompleteName($column))).'">';
+		if ($column->isSortable()) {
+			$html .= '<a class="sortable" href="' .
+			$this->joacubBaseQueryParams(
+					array(
+						'page' => 1,
+						'order' => Json::encode($getColumnCompleteName($column)) . '~' .
+						$column->getOrderDirection()
+					)) . '">';
+			if ($this->grid->getCurrentOrderColumn() == $column) {
+				$html .= '<span class="active">';
+				$html .=  $column->getLabel();
+				if ($this->grid->getCurrentOrderDirection() == 'asc') {
+					$html .= ' <i class="glyphicon glyphicon-sort-by-alphabet"></i>';
+				} elseif ($this->grid->getCurrentOrderDirection() == 'desc') {
+					$html .= ' <i class="glyphicon glyphicon-sort-by-alphabet-alt"></i>';
 				}
-				$html .= '</a>';
+				$html .= '</span>';
 			} else {
 				$html .= $column->getLabel();
+				$html .= ' <i class="glyphicon glyphicon-sort"></i>';
 			}
-			$html .= '</th>';
+			$html .= '</a>';
+		} else {
+			$html .= $column->getLabel();
 		}
+		$html .= '</th>';
 		
 	}
 	
 	return $html;
 };
 
-$treeColumnsPrintCanHide = function (Column $column) use(&$treeColumnsPrintCanHide, $getColumnCompleteName)
+$treeColumnsPrintCanHide = function (Column $column, $print = false) use(&$treeColumnsPrintCanHide, $getColumnCompleteName)
 {
 	$html = '';
 	if ($column->isVisible()) {
-		$columns = (array) $column->getColumns();
-
-		$visibleSubcolumns = array();
-		foreach ($columns as $_column) {
-			if($_column->isVisible()) {
-				$visibleSubcolumns[] = $_column;
-			}
-
-		}
-
-		if($columns && count($visibleSubcolumns) > 0) {
-			foreach($visibleSubcolumns as $_column)
-				$html .= $treeColumnsPrintCanHide($_column);
-		} else {
+	   
 			if ($column->getCanHide()) {
 				$idColumn = md5(Json::encode($getColumnCompleteName($column)));
 				$html .= '<li data-columnid="'.$idColumn.'">';
@@ -97,7 +69,6 @@ $treeColumnsPrintCanHide = function (Column $column) use(&$treeColumnsPrintCanHi
 				$html .= '</li>';
 			} 
 			
-		}
 
 	}
 
