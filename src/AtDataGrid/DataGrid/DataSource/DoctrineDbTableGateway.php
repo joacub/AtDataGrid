@@ -416,6 +416,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
 			
 			$this->getQueryBuilder()->addSelect($this->getEntity());
 			
+			echo $this->getQueryBuilder()->getDQL();exit;
 			$paginator = $this->getPaginator();
 			$paginator->setCurrentPageNumber($currentPage)
 				->setItemCountPerPage($itemsPerPage)
