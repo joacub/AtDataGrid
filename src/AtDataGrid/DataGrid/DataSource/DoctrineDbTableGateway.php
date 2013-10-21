@@ -403,9 +403,9 @@ class DoctrineDbTableGateway extends AbstractDataSource
 				            ->leftJoin($this->getEntity() . '.' . $order['column']->getParent()->getName(),
 				                $columnOrderEntity)
 				                ->groupBy($this->getEntity() . '.id')
-				                ->orderBy($columnOrderEntity . '.' . $order['column']->getName(), $order['direction']);
+				                ->addOrderBy($columnOrderEntity . '.' . $order['column']->getName(), $order['direction']);
 				        } else {
-				            $this->getSelect()->orderBy(
+				            $this->getSelect()->addOrderBy(
 				                $this->getEntity() . '.' . $columnOrder->getName(), $order['direction']);
 				        }
 				        	
