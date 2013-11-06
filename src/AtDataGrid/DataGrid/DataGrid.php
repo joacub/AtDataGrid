@@ -261,7 +261,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
             throw new \Exception('Column `' . $column->getName() . '` already in a column list. Use other name.');
         }
         
-        $this->columns[$this->getColumnId($column)] = $column;
+        $this->columns[$column->getName()] = $column;
         
         // If label is not set, set column name as label
         if (null == $column->getLabel()) {
