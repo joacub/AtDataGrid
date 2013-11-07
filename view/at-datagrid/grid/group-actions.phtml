@@ -9,7 +9,7 @@ $actionsIcons = array('delete' => '<i class="glyphicon glyphicon-trash"></i>');
        <i class="glyphicon glyphicon-export"></i> Exportar <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu">
-        <li><a target="_blank" href="<?php echo $this->url(null, array('action' => 'export'), array('query' => array('type' => 'pdf')), true) ?>">PDF</a></li>
+        <li><a target="_blank" href="<?php echo $this->url(null, array('action' => 'export'), array('query' => array('type' => 'pdf', 'exec' => true)), true) ?>">PDF</a></li>
       </ul>
     </div>
     <div class="btn-group">
