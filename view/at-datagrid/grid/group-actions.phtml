@@ -4,6 +4,14 @@ $actionsIcons = array('delete' => '<i class="glyphicon glyphicon-trash"></i>');
 
 ?>
 <div class="atf-grid-group-actions">
+    <div class="btn-group pull-right">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+       <i class="glyphicon glyphicon-export"></i> Exportar <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu">
+        <li><a target="_blank" href="<?php echo $this->url(null, array('action' => 'export'), array('query' => array('type' => 'pdf')), true) ?>">PDF</a></li>
+      </ul>
+    </div>
     <div class="btn-group">
     	<button type="button" class="btn btn-danger"><i class="glyphicon glyphicon-wrench"></i> <?php echo $this->translate("Con selección") ?></button>
 	  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
