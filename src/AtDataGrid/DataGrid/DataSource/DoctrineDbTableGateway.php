@@ -364,7 +364,13 @@ class DoctrineDbTableGateway extends AbstractDataSource
      */
     public function find($key)
     {
-        $entity = $this->getEm()->find($this->getEntity(), $key);
+        $repo = $this->getEm()->getRepository($this->getEntity());
+        $qb = $repo->createQueryBuilder('table');
+        
+        $qb->where($qb->expr()->eq('table.id', ':id'));
+        $qb->setParameter('id', $key);
+        $entity = $qb->getQuery()->setHint(TranslatableListener::HINT_INNER_JOIN, true)->getOneOrNullResult();
+//         $entity = $this->getEm()->find($this->getEntity(), $key);
         return $entity;
     }
 
@@ -414,7 +420,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
 				
 			}
 			
-			$this->getQueryBuilder()->addSelect($this->getEntity());
+			$this->getQueryBuilder()->addSelect($this->getEntity())->getQuery()->setHint(TranslatableListener::HINT_INNER_JOIN, true);
 			
 			$paginator = $this->getPaginator();
 			$paginator->setCurrentPageNumber($currentPage)

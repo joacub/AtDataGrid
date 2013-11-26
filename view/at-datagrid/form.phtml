@@ -108,6 +108,8 @@ if($grid->getDataSource()->isTranslationTable()) :
     );
     
     foreach ($columnsTranslatable as $column) {
+        if(!$form->has($column))
+            continue;
         $element = $form->get($column);
         
         if(isset($columnsTranslatableKeys[$element->getName()])) {
@@ -122,7 +124,7 @@ if($grid->getDataSource()->isTranslationTable()) :
 	<ul id="tabslangs" class="nav nav-tabs">
 	<?php foreach ($locales as $locale):  ?>
 		<li
-			<?php echo $localeElement->getValue() !== $locale ? null : 'class="active"'?>><a
+			<?php echo $localeElement->getValue() == $locale || ($localeElement->getValue() === null && \Locale::getDefault() == $locale) ? 'class="active"' : null ?>><a
 			href="<?php echo $this->joacubBaseQueryParams(array('locale' => $locale), true); ?>#tab-at-datagrid-locale-<?php echo $locale ?>"
 			data-toggle="tab">
 			<?php 
@@ -136,9 +138,9 @@ if($grid->getDataSource()->isTranslationTable()) :
 	
 	<?php foreach($locales as $locale): ?>
 		<div
-			class="tab-pane <?php echo $localeElement->getValue() !== $locale ? null : 'active'?>"
+			class="tab-pane <?php echo $localeElement->getValue() == $locale || ($localeElement->getValue() === null && \Locale::getDefault() == $locale) ? 'active' : null ?>"
 			id="tab-at-datagrid-locale-<?php echo $locale ?>">
-			<?php $localeElement->getValue() !== $locale ?: $printForm($displayOptions); ?>
+			<?php $localeElement->getValue() == $locale || ($localeElement->getValue() === null && \Locale::getDefault() == $locale) ? $printForm($displayOptions) : ''; ?>
 		</div>
 		<?php endforeach; ?>
 	</div>
@@ -174,8 +176,8 @@ $(document).ready(function(){
       
 });
 
-$('#tabslangs a').on('shown', function (e) {
-	$('#tabslangs a').trigger('start', [e]);
+$('#tabslangs a').on('shown.bs.tab', function (e) {
+	$('#tabslangs a').trigger('start.bs.tab', [e]);
     var parts = $(this).attr('href').split('#');
     
     var relateTarget = e.relatedTarget + '';
@@ -191,7 +193,7 @@ $('#tabslangs a').on('shown', function (e) {
         $tab.block({ message: '<img  src="<?php echo $this->basePath(); ?>/img/at-datagrid/ajax-loader.gif" alt="Cargando..." >', css: {height:'128px', width:'128px', background: 'transparent', border: 'none'} });
         
     	var iframe = $('<iframe>').hide().attr('src', $(this).attr('href')).load(function() {
-    	    var content = $(this).contents().find('#tabslangs + .tab-content #'+$tab.attr('id')).html();
+    	    var content = $(this).contents().find('#'+$tab.attr('id')).html();
     	    $tab.html(content);
     	    $tab.height('auto');
     	    $(this).contents().find('body').find("script:contains(\"validate\")").each(function(i) {

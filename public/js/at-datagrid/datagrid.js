@@ -59,7 +59,7 @@ var DataGrid = new Object({
 });
 
 jQuery(function($) {
-	
+	if($('.todo-list').length)
 	$('.todo-list').sortable({
 		start: function(event, ui) { 
             jQuery.data( ui.item, 'previndex',  ui.item.index());
