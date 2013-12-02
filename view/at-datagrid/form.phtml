@@ -177,6 +177,8 @@ $(document).ready(function(){
 });
 
 $('#tabslangs a').on('shown.bs.tab', function (e) {
+	window.location.href = $(this).attr('href');
+	return;
 	$('#tabslangs a').trigger('start.bs.tab', [e]);
     var parts = $(this).attr('href').split('#');
     
@@ -193,6 +195,7 @@ $('#tabslangs a').on('shown.bs.tab', function (e) {
         $tab.block({ message: '<img  src="<?php echo $this->basePath(); ?>/img/at-datagrid/ajax-loader.gif" alt="Cargando..." >', css: {height:'128px', width:'128px', background: 'transparent', border: 'none'} });
         
     	var iframe = $('<iframe>').hide().attr('src', $(this).attr('href')).load(function() {
+
     	    var content = $(this).contents().find('#'+$tab.attr('id')).html();
     	    $tab.html(content);
     	    $tab.height('auto');
@@ -201,7 +204,7 @@ $('#tabslangs a').on('shown.bs.tab', function (e) {
             });
 
             $tab.unblock();
-            $('#tabslangs a').trigger('end', [e]);
+            $('#tabslangs a').trigger('end.bs.tab', [e]);
     	});
     	
     	$('body').append(iframe);
