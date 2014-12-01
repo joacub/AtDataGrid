@@ -252,13 +252,7 @@ class Manager
     		}
     		 
     	}
-    	$response = $this->getserviceManager()->get('response');
-    	if(!$response instanceof Response || !$response->getHeaders()->has('ZfJoacubFormJqueryValidate')) {
-    		//Hash element to prevent CSRF attack
-    		$csrf = new \Zend\Form\Element\Csrf('hash');
-    		$form->add($csrf);
-    	}
-    	 
+
     	// Use this method to add additional element to form
     	// @todo Use Event instead
     	$form = $this->addExtraFormElements($form);
