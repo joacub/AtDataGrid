@@ -923,6 +923,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
         $repo = $em->getRepository('AtAdmin\Entity\ColumnState');
         $auth = $this->getServiceManager()->get('zfcuser_auth_service');
         $user = $auth->getIdentity();
+        $tmpColumns = array();
         
         foreach ($this->columns as $k => $v) {
             if ($v->isVisible()) {
