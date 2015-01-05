@@ -369,7 +369,12 @@ class DoctrineDbTableGateway extends AbstractDataSource
         
         $qb->where($qb->expr()->eq('table.id', ':id'));
         $qb->setParameter('id', $key);
-        $entity = $qb->getQuery()->setHint(TranslatableListener::HINT_INNER_JOIN, true)->getOneOrNullResult();
+        $entity = $qb->getQuery()
+            ->setHint(TranslatableListener::HINT_INNER_JOIN, true)->getOneOrNullResult();
+        $qb->getQuery()->setHint(
+            TranslatableListener::HINT_FALLBACK,
+            1 // fallback to default values in case if record is not translated
+        );
 //         $entity = $this->getEm()->find($this->getEntity(), $key);
         return $entity;
     }
