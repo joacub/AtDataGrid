@@ -180,7 +180,7 @@ class Manager
     			//obtenemos el formulario automaticamente de la entidad en caso de no tener un formulario personalizado
     			$form = $this->_getForm($options);
     		}
-    
+
     		//prepara el formulario
     		// quita elementos que tenga que quitar y mas
     		return $this->prepareForm($form);
@@ -195,7 +195,7 @@ class Manager
     	$form = $this->getServiceManager()->get('formGenerator')
     	->setClass($this->getGrid()->getDataSource()->getEntity())
     	->getForm();
-    	
+
     	return $form;
     }
     
@@ -213,7 +213,7 @@ class Manager
     		if($form->has($column->getName())) {
     			$formElement = $form->get($column->getName());
     		}
-    		 
+
     		if(!$formElement) {
     			$fieldsets = $form->getFieldsets();
     			foreach($fieldsets as $fieldset) {
@@ -223,30 +223,33 @@ class Manager
     				}
     			}
     		}
-    
+
     		if($formElement) {
     			$optionsElement = $column->getFormElement()->getOptions();
     			$column->setFormElement($formElement);
-    			$formElement->setOptions($optionsElement + $formElement->getOptions());
+                foreach($optionsElement as $optionElement => $optionElementValue) {
+                    $formElement->setOption($optionElement, $optionElementValue);
+                }
+
     		}
-    		 
+
     		if (!$column->isVisibleInForm()) {
-    			 
+
     			$form->remove($column->getName());
     			$form->getInputFilter()->remove($column->getName());
-    			 
+
     			if(isset($fieldset)) {
     				$form->getInputFilter()->get($fieldset->getName())->remove(($column->getName()));
     				$fieldset->remove($column->getName());
     				$fieldset = false;
     			}
-    			 
+
     			continue;
     		}
     		continue;
     		/* @var \Zend\Form\Element */
     		$element = $column->getFormElement();
-    		 
+
     		if(!$form->get($column->getName())->getLabel()) {
     			$form->get($column->getName())->setLabel($column->getLabel());
     		}
