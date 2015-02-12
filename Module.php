@@ -1,6 +1,8 @@
 <?php
 
 namespace AtDataGrid;
+use Zend\Mvc\MvcEvent;
+use Gedmo\Translatable\TranslatableListener;
 
 /**
  * Class Module
@@ -52,5 +54,28 @@ class Module
                 'backTo' => 'AtBase\Mvc\Controller\Plugin\BackTo'
             ),
         );
+    }
+
+    public function onBootstrap(MvcEvent $e)
+    {
+        $translator = $e->getApplication()->getServiceManager()->get('translator');
+        $translator->setLocale(str_replace('-', '_', \Locale::getDefault()));
+
+        $em = $e->getApplication()->getServiceManager()->get('Doctrine\ORM\EntityManager');
+
+        $events = $em
+            ->getEventManager()
+            ->getListeners();
+        foreach ($events as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                if ($listener instanceof TranslatableListener) {
+                    $listener->setTranslatableLocale('es-ES');
+                    $listener->setDefaultLocale('es-ES');
+                    $listener->setPersistDefaultLocaleTranslation(true);
+                    $listener->setTranslationFallback(true);
+                }
+            }
+        }
+
     }
 }
