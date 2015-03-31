@@ -506,7 +506,7 @@ class DoctrineDbTableGateway extends AbstractDataSource
         $em = $this->getEm();
         
         $entityName = $this->getEntity();
-        if(is_object($data) && $entityName == get_class($data)) {
+        if(is_object($data) && ($entityName == get_class($data) || $entityName == get_parent_class($data))) {
             $entity = $data;
         } else {
             $entity = $this->find($key);
