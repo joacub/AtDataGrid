@@ -61,7 +61,27 @@ class Module
         $translator = $e->getApplication()->getServiceManager()->get('translator');
         $translator->setLocale(str_replace('-', '_', \Locale::getDefault()));
 
-        $em = $e->getApplication()->getServiceManager()->get('Doctrine\ORM\EntityManager');
+        $sl = $e->getApplication()->getServiceManager();
+
+        $em = $sl->get('Doctrine\ORM\EntityManager');
+
+        $defaultLang = str_replace('_', '-', \Locale::getDefault());
+
+        try {
+            $detector = $sl->get('SlmLocale\Locale\Detector');
+            $configSlm =$sl->get('config');
+            $configSlm = $configSlm['slm_locale'];
+            /**
+             * @var $detector Detector
+             */
+
+            if(isset($configSlm['aliases'][$detector->getDefault()])) {
+                $defaultLang = $configSlm['aliases'][$detector->getDefault()];
+            } else {
+                $defaultLang = $detector->getDefault();
+            }
+        } catch (\Exception $e) {
+        }
 
         $events = $em
             ->getEventManager()
@@ -69,8 +89,8 @@ class Module
         foreach ($events as $event => $listeners) {
             foreach ($listeners as $listener) {
                 if ($listener instanceof TranslatableListener) {
-                    $listener->setTranslatableLocale('es-ES');
-                    $listener->setDefaultLocale('es-ES');
+                    $listener->setTranslatableLocale($defaultLang);
+                    $listener->setDefaultLocale($defaultLang);
                     $listener->setPersistDefaultLocaleTranslation(true);
                     $listener->setTranslationFallback(true);
                 }
