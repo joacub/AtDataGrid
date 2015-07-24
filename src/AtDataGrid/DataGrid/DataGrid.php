@@ -695,7 +695,7 @@ class DataGrid implements \Countable, \IteratorAggregate, \ArrayAccess
                     }
                 }
             } else {
-                
+
                 if ($column->hasFilters()) {
                     $filters = $column->getFilters();
                     foreach ($filters as $filter) {

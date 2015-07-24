@@ -82,7 +82,7 @@ class ATF_DataGrid_Column_BitMask extends ATF_DataGrid_Column
                     ->setMultiOptions($options)
                     ->addDecorator(array('div' => 'htmlTag'), array('tag' => 'div'));
 
-        $this->_filterFormElements[$filter->getName()] = $formElement;                    
+        $this->_filterFormElements[$filter->getName()] = $formElement;
                     
         return $formElement;                                
     }

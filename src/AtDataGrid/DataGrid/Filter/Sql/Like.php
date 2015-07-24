@@ -2,6 +2,7 @@
 
 namespace AtDataGrid\DataGrid\Filter\Sql;
 
+use AtDataGrid\DataGrid\Column\DbReference;
 use AtDataGrid\DataGrid\Filter;
 use AtDataGrid\DataGrid\DataSource\DoctrineDbTableGateway;
 use AtDataGrid\DataGrid\Filter\Parameter\ParameterId;
@@ -25,18 +26,24 @@ class Like extends Filter\AbstractFilter
             
             //$columnName = $this->findTableColumnName($select, $column->getName());
             $columnName = $column->getName();
-           
+
             if($dataSource instanceof QueryBuilder) {
             	$dataSource instanceof \Doctrine\ORM\QueryBuilder;
                 $parameter = ParameterId::getParameter(__CLASS__, $columnName);
                 $qb = $dataSource;
                 
                 if($column->getParent() == null) {
+
+                    if($column instanceof DbReference) {
+                        $_columName = 'IDENTITY(' . $qb->getRootAlias() . '.' . $columnName . ')';
+                    } else {
+                        $_columName = $qb->getRootAlias() . '.' . $columnName;
+                    }
                 	$qb->andWhere(
                     $qb->expr()
                         ->orx(
                         $qb->expr()
-                            ->like($qb->getRootAlias() . '.' . $columnName, ':' . $parameter)))->setParameter($parameter, '%' . $value . '%');
+                            ->like($_columName, ':' . $parameter)))->setParameter($parameter, '%' . $value . '%');
                 } else {
                 
                 	$parentColumn = $column->getParent();

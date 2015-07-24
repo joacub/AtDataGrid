@@ -208,7 +208,7 @@ class Manager
     {
     	// Collect elements
     	foreach ($this->getGrid()->getColumns() as $column) {
-    		
+
     		$formElement = false;
     		if($form->has($column->getName())) {
     			$formElement = $form->get($column->getName());
